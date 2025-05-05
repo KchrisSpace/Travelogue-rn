@@ -24,6 +24,40 @@
       "password": "123456"
     }
   ],
+  "follows": [
+    {
+      "id": "follow1",
+      "followerId": "user1",
+      "followingId": "user2",
+      "createdAt": "2024-03-01T10:00:00Z"
+    },
+    {
+      "id": "follow2",
+      "followerId": "user1",
+      "followingId": "user3",
+      "createdAt": "2024-03-02T10:00:00Z"
+    },
+    {
+      "id": "follow3",
+      "followerId": "user2",
+      "followingId": "user1",
+      "createdAt": "2024-03-03T10:00:00Z"
+    }
+  ],
+  "favorites": [
+    {
+      "id": "favorite1",
+      "userId": "user1",
+      "travelogueId": "travelogue2",
+      "createdAt": "2024-03-01T10:00:00Z"
+    },
+    {
+      "id": "favorite2",
+      "userId": "user1",
+      "travelogueId": "travelogue3",
+      "createdAt": "2024-03-02T10:00:00Z"
+    }
+  ],
   "travelogue": [
     {
       "id": "travelogue1",

@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
   Image,
@@ -7,100 +8,136 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Favorite, useFavorite } from "../../hooks/useFavorite";
+import { Follow, useFollow } from "../../hooks/useFollow";
 import { Travelogue, useTravelogue } from "../../hooks/useTravelogue";
 
 export default function PersonalCenter() {
   const [travelogues, setTravelogues] = useState<Travelogue[]>([]);
-  const { getTravelogues, deleteTravelogue } = useTravelogue();
+  const [followings, setFollowings] = useState<Follow[]>([]);
+  const [followers, setFollowers] = useState<Follow[]>([]);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const { getTravelogues } = useTravelogue();
+  const { getFollowings, getFollowers } = useFollow();
+  const { getFavorites } = useFavorite();
 
-  useEffect(() => {
-    fetchTravelogues();
-  }, []);
+  // 假设当前用户ID为 user1
+  const currentUserId = "user1";
 
   const fetchTravelogues = async () => {
     try {
       const data = await getTravelogues();
       setTravelogues(data);
+      console.log(data);
     } catch (error) {
       console.error("Error fetching travelogues:", error);
     }
   };
 
-  const handleDeleteTravelogue = async (id: string) => {
+  const fetchFollowData = async () => {
     try {
-      await deleteTravelogue(id);
-      // 重新获取游记列表
-      fetchTravelogues();
+      const [followingsData, followersData] = await Promise.all([
+        getFollowings(currentUserId),
+        getFollowers(currentUserId),
+      ]);
+      setFollowings(followingsData);
+      setFollowers(followersData);
     } catch (error) {
-      console.error("Error deleting travelogue:", error);
+      console.error("Error fetching follow data:", error);
     }
   };
 
+  const fetchFavorites = async () => {
+    try {
+      const data = await getFavorites(currentUserId);
+      setFavorites(data);
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    }
+  };
+
+  useEffect(() => {
+    const initializeData = async () => {
+      await Promise.all([
+        fetchTravelogues(),
+        fetchFollowData(),
+        fetchFavorites(),
+      ]);
+    };
+
+    initializeData();
+  }, []);
+
+  const handleSettingsPress = () => {
+    // TODO: 实现设置页面跳转
+    console.log("Settings pressed");
+  };
+
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: "#f3f4f6" }}>
-      {/* 头部封面图 */}
-      <View style={styles.cover} />
-      {/* 个人信息 */}
-      <View style={styles.profileInfoWrap}>
-        <View style={styles.profileRow}>
-          <View style={styles.avatarWrap}>
-            <Image
-              source={require("../../assets/images/avatar/image.png")}
-              style={styles.avatar}
-            />
-            <TouchableOpacity style={styles.avatarEditBtn}>
-              <Text style={{ fontSize: 16, color: "#666" }}>✎</Text>
+    <View style={{ flex: 1, backgroundColor: "#f3f4f6" }}>
+      <TouchableOpacity
+        style={styles.settingsButton}
+        onPress={handleSettingsPress}
+      >
+        <Ionicons name="settings-outline" size={24} color="#fff" />
+      </TouchableOpacity>
+      <ScrollView>
+        {/* 头部封面图 */}
+        <View style={styles.cover} />
+        {/* 个人信息 */}
+        <View style={styles.profileInfoWrap}>
+          <View style={styles.profileRow}>
+            <View style={styles.avatarWrap}>
+              <Image
+                source={require("../../assets/images/avatar/image.png")}
+                style={styles.avatar}
+              />
+              <TouchableOpacity style={styles.avatarEditBtn}>
+                <Text style={{ fontSize: 16, color: "#666" }}>✎</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ marginLeft: 16, marginBottom: 8 }}>
+              <Text style={styles.username}>用户名</Text>
+              <Text style={styles.userTag}>@username</Text>
+            </View>
+          </View>
+          <View style={styles.statsRow}>
+            <TouchableOpacity style={styles.statItem}>
+              <Text style={styles.statNum}>{followings.length}</Text>
+              <Text style={styles.statLabel}>关注</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.statItem}>
+              <Text style={styles.statNum}>{followers.length}</Text>
+              <Text style={styles.statLabel}>粉丝</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.statItem}>
+              <Text style={styles.statNum}>{favorites.length}</Text>
+              <Text style={styles.statLabel}>收藏</Text>
             </TouchableOpacity>
           </View>
-          <View style={{ marginLeft: 16, marginBottom: 8 }}>
-            <Text style={styles.username}>用户名</Text>
-            <Text style={styles.userTag}>@username</Text>
-          </View>
+          <TouchableOpacity style={styles.editBtn}>
+            <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+              编辑个人资料
+            </Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNum}>128</Text>
-            <Text style={styles.statLabel}>关注</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNum}>256</Text>
-            <Text style={styles.statLabel}>粉丝</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNum}>{travelogues.length}</Text>
-            <Text style={styles.statLabel}>游记</Text>
-          </View>
-        </View>
-        <TouchableOpacity style={styles.editBtn}>
-          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
-            编辑个人资料
-          </Text>
-        </TouchableOpacity>
-      </View>
-      {/* 我的游记 */}
-      <View style={styles.travelogueSection}>
-        <Text style={styles.travelogueTitle}>我的游记</Text>
-        {travelogues.map((item) => (
-          <View key={item.id} style={styles.travelogueItem}>
-            <View>
-              <Text style={styles.travelogueItemTitle}>{item.title}</Text>
-              <Text style={styles.travelogueItemDate}>{item.date}</Text>
-            </View>
-            <View style={styles.buttonGroup}>
+        {/* 我的游记 */}
+        <View style={styles.travelogueSection}>
+          <Text style={styles.travelogueTitle}>我的游记</Text>
+          {travelogues.map((item) => (
+            <View key={item.id} style={styles.travelogueItem}>
+              <View>
+                <Text style={styles.travelogueItemTitle}>{item.title}</Text>
+                <Text style={styles.travelogueItemDate}>{item.date}</Text>
+              </View>
               <TouchableOpacity style={styles.viewBtn}>
                 <Text style={{ color: "#fff", fontWeight: "bold" }}>查看</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.deleteBtn}
-                onPress={() => handleDeleteTravelogue(item.id)}
-              >
-                <Text style={{ color: "#fff", fontWeight: "bold" }}>删除</Text>
-              </TouchableOpacity>
             </View>
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -109,8 +146,15 @@ const styles = StyleSheet.create({
     height: 120,
     backgroundColor: "#d1d5db",
     width: "100%",
-
-    // 可替换为ImageBackground实现背景图
+  },
+  settingsButton: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    borderRadius: 20,
+    padding: 8,
+    zIndex: 999,
   },
   profileInfoWrap: {
     backgroundColor: "#fff",
@@ -224,16 +268,6 @@ const styles = StyleSheet.create({
   },
   viewBtn: {
     backgroundColor: "#22c55e",
-    borderRadius: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  buttonGroup: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  deleteBtn: {
-    backgroundColor: "#ef4444",
     borderRadius: 6,
     paddingHorizontal: 16,
     paddingVertical: 8,
