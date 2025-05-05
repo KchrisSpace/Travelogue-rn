@@ -1,20 +1,41 @@
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
   Image,
-  TouchableOpacity,
   ScrollView,
   StyleSheet,
-  Button,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-
-const mockTravelogues = [
-  { title: "探索巴厘岛的自然之美", date: "2024年4月18日" },
-  { title: "探索墨西哥图卢姆的古遗址", date: "2024年4月15日" },
-  { title: "大阪的樱花季节", date: "2024年4月10日" },
-];
+import { Travelogue, useTravelogue } from "../../hooks/useTravelogue";
 
 export default function PersonalCenter() {
+  const [travelogues, setTravelogues] = useState<Travelogue[]>([]);
+  const { getTravelogues, deleteTravelogue } = useTravelogue();
+
+  useEffect(() => {
+    fetchTravelogues();
+  }, []);
+
+  const fetchTravelogues = async () => {
+    try {
+      const data = await getTravelogues();
+      setTravelogues(data);
+    } catch (error) {
+      console.error("Error fetching travelogues:", error);
+    }
+  };
+
+  const handleDeleteTravelogue = async (id: string) => {
+    try {
+      await deleteTravelogue(id);
+      // 重新获取游记列表
+      fetchTravelogues();
+    } catch (error) {
+      console.error("Error deleting travelogue:", error);
+    }
+  };
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#f3f4f6" }}>
       {/* 头部封面图 */}
@@ -24,9 +45,7 @@ export default function PersonalCenter() {
         <View style={styles.profileRow}>
           <View style={styles.avatarWrap}>
             <Image
-              source={{
-                uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-              }}
+              source={require("../../assets/images/avatar/image.png")}
               style={styles.avatar}
             />
             <TouchableOpacity style={styles.avatarEditBtn}>
@@ -48,7 +67,7 @@ export default function PersonalCenter() {
             <Text style={styles.statLabel}>粉丝</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNum}>32</Text>
+            <Text style={styles.statNum}>{travelogues.length}</Text>
             <Text style={styles.statLabel}>游记</Text>
           </View>
         </View>
@@ -61,15 +80,23 @@ export default function PersonalCenter() {
       {/* 我的游记 */}
       <View style={styles.travelogueSection}>
         <Text style={styles.travelogueTitle}>我的游记</Text>
-        {mockTravelogues.map((item, idx) => (
-          <View key={idx} style={styles.travelogueItem}>
+        {travelogues.map((item) => (
+          <View key={item.id} style={styles.travelogueItem}>
             <View>
               <Text style={styles.travelogueItemTitle}>{item.title}</Text>
               <Text style={styles.travelogueItemDate}>{item.date}</Text>
             </View>
-            <TouchableOpacity style={styles.viewBtn}>
-              <Text style={{ color: "#fff", fontWeight: "bold" }}>查看</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonGroup}>
+              <TouchableOpacity style={styles.viewBtn}>
+                <Text style={{ color: "#fff", fontWeight: "bold" }}>查看</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteBtn}
+                onPress={() => handleDeleteTravelogue(item.id)}
+              >
+                <Text style={{ color: "#fff", fontWeight: "bold" }}>删除</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
       </View>
@@ -82,6 +109,7 @@ const styles = StyleSheet.create({
     height: 120,
     backgroundColor: "#d1d5db",
     width: "100%",
+
     // 可替换为ImageBackground实现背景图
   },
   profileInfoWrap: {
@@ -196,6 +224,16 @@ const styles = StyleSheet.create({
   },
   viewBtn: {
     backgroundColor: "#22c55e",
+    borderRadius: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  buttonGroup: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  deleteBtn: {
+    backgroundColor: "#ef4444",
     borderRadius: 6,
     paddingHorizontal: 16,
     paddingVertical: 8,

@@ -1,0 +1,47 @@
+{
+  "user": [
+    {
+      "id": "user1",
+      "name": "张三",
+      "password": "123456",
+      "user-info": {
+        "avatar": "https://img.yzcdn.cn/vant/ipad.png",
+        "nickname": "张三",
+        "gender": "男",
+        "birthday": "1990-01-01",
+        "city": "北京",
+        "signature": "热爱生活，热爱旅行"
+      }
+    },
+    {
+      "id": "user2",
+      "name": "李四",
+      "password": "123456"
+    },
+    {
+      "id": "user3",
+      "name": "王五",
+      "password": "123456"
+    }
+  ],
+  "travelogue": [
+    {
+      "id": "travelogue1",
+      "user-id": "user1",
+      "title": "探索巴厘岛的自然之美",
+      "date": "2024年4月18日"
+    },
+    {
+      "id": "travelogue2",
+      "user-id": "user1",
+      "title": "探索墨西哥图卢姆的古遗址",
+      "date": "2024年4月15日"
+    },
+    {
+      "id": "travelogue3",
+      "user-id": "user1",
+      "title": "大阪的樱花季节",
+      "date": "2024年4月10日"
+    }
+  ]
+}
