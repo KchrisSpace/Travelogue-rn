@@ -3,7 +3,7 @@ import { Tabs, useRouter } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import { useAuth } from "../context/auth";
 
-function FilteredTouchableOpacity(props) {
+function FilteredTouchableOpacity(props: any) {
   // 过滤掉props中为null的属性，避免类型报错
   const filteredProps = Object.fromEntries(
     Object.entries(props).filter(([_, v]) => v !== null)

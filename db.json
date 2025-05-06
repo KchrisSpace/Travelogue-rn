@@ -63,13 +63,13 @@
   "favorites": [
     {
       "id": "favorite1",
-      "userId": "user1",
+      "user-id": "user1",
       "travelogueId": "travelogue2",
       "createdAt": "2024-03-01T10:00:00Z"
     },
     {
       "id": "favorite2",
-      "userId": "user1",
+      "user-id": "user1",
       "travelogueId": "travelogue3",
       "createdAt": "2024-03-02T10:00:00Z"
     }
@@ -89,7 +89,7 @@
     },
     {
       "id": "travelogue3",
-      "user-id": "user1",
+      "user-id": "user2",
       "title": "大阪的樱花季节",
       "date": "2024年4月10日"
     }

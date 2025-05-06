@@ -13,6 +13,19 @@ import {
 } from "react-native";
 import { useAuth } from "../context/auth";
 
+interface User {
+  id: string;
+  password: string;
+  "user-info"?: {
+    avatar?: string;
+    nickname?: string;
+    gender?: string;
+    birthday?: string;
+    city?: string;
+    signature?: string;
+  };
+}
+
 export default function LoginScreen() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +41,7 @@ export default function LoginScreen() {
       }
       await login(id, password);
       if (redirect) {
-        router.replace(redirect);
+        router.replace(redirect as any);
       } else {
         router.replace("/(tabs)");
       }

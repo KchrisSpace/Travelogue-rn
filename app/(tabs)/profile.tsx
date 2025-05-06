@@ -11,8 +11,10 @@ import {
 import { Favorite, useFavorite } from "../../hooks/useFavorite";
 import { Follow, useFollow } from "../../hooks/useFollow";
 import { Travelogue, useTravelogue } from "../../hooks/useTravelogue";
+import { useAuth } from "../context/auth";
 
 export default function PersonalCenter() {
+  const { user } = useAuth();
   const [travelogues, setTravelogues] = useState<Travelogue[]>([]);
   const [followings, setFollowings] = useState<Follow[]>([]);
   const [followers, setFollowers] = useState<Follow[]>([]);
@@ -21,52 +23,30 @@ export default function PersonalCenter() {
   const { getFollowings, getFollowers } = useFollow();
   const { getFavorites } = useFavorite();
 
-  // 假设当前用户ID为 user1
-  const currentUserId = "user1";
-
-  const fetchTravelogues = async () => {
-    try {
-      const data = await getTravelogues();
-      setTravelogues(data);
-      console.log(data);
-    } catch (error) {
-      console.error("Error fetching travelogues:", error);
-    }
-  };
-
-  const fetchFollowData = async () => {
-    try {
-      const [followingsData, followersData] = await Promise.all([
-        getFollowings(currentUserId),
-        getFollowers(currentUserId),
-      ]);
-      setFollowings(followingsData);
-      setFollowers(followersData);
-    } catch (error) {
-      console.error("Error fetching follow data:", error);
-    }
-  };
-
-  const fetchFavorites = async () => {
-    try {
-      const data = await getFavorites(currentUserId);
-      setFavorites(data);
-    } catch (error) {
-      console.error("Error fetching favorites:", error);
-    }
-  };
+  const currentUserId = user?.id;
 
   useEffect(() => {
-    const initializeData = async () => {
-      await Promise.all([
-        fetchTravelogues(),
-        fetchFollowData(),
-        fetchFavorites(),
-      ]);
+    if (!currentUserId) return;
+    const fetchData = async () => {
+      try {
+        // 只获取当前用户的游记
+        const [traveloguesData, followingsData, followersData, favoritesData] =
+          await Promise.all([
+            getTravelogues(currentUserId),
+            getFollowings(currentUserId),
+            getFollowers(currentUserId),
+            getFavorites(currentUserId),
+          ]);
+        setTravelogues(traveloguesData);
+        setFollowings(followingsData);
+        setFollowers(followersData);
+        setFavorites(favoritesData);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
     };
-
-    initializeData();
-  }, []);
+    fetchData();
+  }, [currentUserId]);
 
   const handleSettingsPress = () => {
     // TODO: 实现设置页面跳转
@@ -89,7 +69,11 @@ export default function PersonalCenter() {
           <View style={styles.profileRow}>
             <View style={styles.avatarWrap}>
               <Image
-                source={require("../../assets/images/avatar/image.png")}
+                source={
+                  (user as any)?.["user-info"]?.avatar
+                    ? { uri: (user as any)["user-info"].avatar }
+                    : require("../../assets/images/avatar/image.png")
+                }
                 style={styles.avatar}
               />
               <TouchableOpacity style={styles.avatarEditBtn}>
@@ -97,8 +81,10 @@ export default function PersonalCenter() {
               </TouchableOpacity>
             </View>
             <View style={{ marginLeft: 16, marginBottom: 8 }}>
-              <Text style={styles.username}>用户名</Text>
-              <Text style={styles.userTag}>@username</Text>
+              <Text style={styles.username}>
+                {(user as any)?.["user-info"]?.nickname || user?.id || "未登录"}
+              </Text>
+              <Text style={styles.userTag}>@{user?.id || "未登录"}</Text>
             </View>
           </View>
           <View style={styles.statsRow}>

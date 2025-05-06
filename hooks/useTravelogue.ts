@@ -10,11 +10,17 @@ export interface Travelogue {
 }
 
 export const useTravelogue = () => {
-  // 获取所有游记
-  const getTravelogues = async () => {
+  // 获取所有游记或指定用户的游记
+  const getTravelogues = async (userId?: string) => {
     try {
-      const response = await axios.get(`${API_URL}/travelogue`);
-      return response.data;
+      const url = `${API_URL}/travelogue`;
+      const response = await axios.get(url);
+      let data = response.data;
+      if (userId) {
+        data = data.filter((item: any) => item["user-id"] === userId);
+        console.log(data);
+      }
+      return data;
     } catch (error) {
       console.error("Error fetching travelogues:", error);
       throw error;
