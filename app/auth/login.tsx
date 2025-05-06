@@ -37,6 +37,8 @@ export default function LoginScreen() {
     try {
       if (!id || !password) {
         Alert.alert("错误", "请填写账号和密码");
+        setId("");
+        setPassword("");
         return;
       }
       await login(id, password);
@@ -47,6 +49,8 @@ export default function LoginScreen() {
       }
     } catch (error: any) {
       Alert.alert("登录失败", error.message || "请检查您的账号和密码");
+      setId("");
+      setPassword("");
     }
   };
 

@@ -38,6 +38,10 @@
         "city": "北京",
         "signature": "热爱生活，热爱旅行"
       }
+    },
+    {
+      "id": "user111",
+      "password": "000000"
     }
   ],
   "follows": [
@@ -58,6 +62,12 @@
       "followerId": "user2",
       "followingId": "user1",
       "createdAt": "2024-03-03T10:00:00Z"
+    },
+    {
+      "id": "follow4",
+      "followerId": "user3",
+      "followingId": "user1",
+      "createdAt": "2024-03-04T10:00:00Z"
     }
   ],
   "favorites": [

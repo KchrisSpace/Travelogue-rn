@@ -10,7 +10,8 @@ export interface Travelogue {
 }
 
 export const useTravelogue = () => {
-  // 获取所有游记或指定用户的游记
+  
+  // 获取指定用户的游记
   const getTravelogues = async (userId?: string) => {
     try {
       const url = `${API_URL}/travelogue`;

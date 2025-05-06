@@ -15,7 +15,6 @@ import {
 
 export default function RegisterScreen() {
   const [id, setId] = useState("");
-  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -28,11 +27,25 @@ export default function RegisterScreen() {
       Alert.alert("错误", "两次输入的密码不一致");
       return;
     }
-    // TODO: 实现注册逻辑，保存id、name、password
-    // 这里只做本地打印
-    console.log("Register:", { id, name, password });
-    Alert.alert("注册成功", "请返回登录页面登录");
-    router.replace("/auth/login");
+    try {
+      // 检查账号是否已存在
+      const checkRes = await fetch(`http://localhost:3000/user?id=${id}`);
+      const users = await checkRes.json();
+      if (users && users.length > 0) {
+        Alert.alert("错误", "该账号已存在");
+        return;
+      }
+      // 写入新用户
+      const newUser = { id, password };
+      await fetch("http://localhost:3000/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      }); 
+      router.replace("/auth/login");
+    } catch (error) {
+      Alert.alert("注册失败", "请重试");
+    }
   };
 
   return (
@@ -54,13 +67,6 @@ export default function RegisterScreen() {
               placeholder="账号"
               value={id}
               onChangeText={setId}
-              autoCapitalize="none"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="昵称（可选）"
-              value={name}
-              onChangeText={setName}
               autoCapitalize="none"
             />
             <TextInput
