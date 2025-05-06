@@ -1,36 +1,15 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import React from "react";
-import { Platform } from "react-native";
-import { useThemeColor } from "@/hooks/useThemeColor";
-import { FontAwesome } from "@expo/vector-icons";
-
-import { HapticTab } from "@/components/HapticTab";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import TabBarBackground from "@/components/ui/TabBarBackground";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const backgroundColor = useThemeColor({}, "background");
-  const tintColor = useThemeColor({}, "tint");
-
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: tintColor,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: { backgroundColor },
-      }}
-    >
+    <Tabs>
       <Tabs.Screen
         name="index"
         options={{
           title: "首页",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="home" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
           ),
         }}
       />
@@ -38,8 +17,8 @@ export default function TabLayout() {
         name="travelogue"
         options={{
           title: "发布游记",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="plus-square" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="plus-square" size={size} color={color} />
           ),
         }}
       />
@@ -47,8 +26,9 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "我的",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="user" color={color} />
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
           ),
         }}
       />

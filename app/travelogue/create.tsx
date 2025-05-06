@@ -54,7 +54,7 @@
    return (
      <ScrollView style={[styles.container, { backgroundColor }]}>
        <View style={styles.form}>
-         <ThemedText type="title">发布游记</ThemedText>
+        
 
          <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
            {image ? (
