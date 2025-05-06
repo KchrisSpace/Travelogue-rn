@@ -16,12 +16,28 @@
     {
       "id": "user2",
       "name": "李四",
-      "password": "123456"
+      "password": "123456",
+      "user-info": {
+        "avatar": "https://img.yzcdn.cn/vant/ipad.png",
+        "nickname": "李四",
+        "gender": "女",
+        "birthday": "1990-01-01",
+        "city": "北京",
+        "signature": "热爱生活，热爱旅行"
+      }
     },
     {
       "id": "user3",
       "name": "王五",
-      "password": "123456"
+      "password": "123456",
+      "user-info": {
+        "avatar": "https://img.yzcdn.cn/vant/ipad.png",
+        "nickname": "王五",
+        "gender": "男",
+        "birthday": "1990-01-01",
+        "city": "北京",
+        "signature": "热爱生活，热爱旅行"
+      }
     }
   ],
   "follows": [
