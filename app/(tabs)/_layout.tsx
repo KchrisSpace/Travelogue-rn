@@ -19,11 +19,12 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: { backgroundColor },
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: '首页',
+          title: "首页",
           tabBarIcon: ({ color }: { color: string }) => (
             <FontAwesome size={28} name="home" color={color} />
           ),
@@ -32,7 +33,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="travelogue"
         options={{
-          title: '发布游记',
+          title: "发布游记",
           tabBarIcon: ({ color }: { color: string }) => (
             <FontAwesome size={28} name="plus-square" color={color} />
           ),
@@ -41,10 +42,28 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: '我的',
-          tabBarIcon: ({ color }) => (
+          title: "我的",
+          tabBarIcon: ({ color }: { color: string }) => (
             <FontAwesome size={28} name="user" color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="index_all"
+        options={{
+          title: "All",
+          tabBarItemStyle: {
+            display: "none",
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="index_follow"
+        options={{
+          title: "Follow",
+          tabBarItemStyle: {
+            display: "none",
+          },
         }}
       />
     </Tabs>
