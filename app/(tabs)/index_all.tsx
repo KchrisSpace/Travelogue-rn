@@ -41,7 +41,7 @@ const fetchNotes = async ({
   return response.data;
 };
 
-const IndexAll = () => {
+const index_all = () => {
   const {
     data,
     fetchNextPage,
@@ -86,21 +86,24 @@ const IndexAll = () => {
           fetchNextPage();
         }
       }}
-      onEndReachedThreshold={0.8}
+      onEndReachedThreshold={1}
       renderItem={({ item }) => (
-        <Pressable className="flex-1 flex-col bg-white rounded-sm m-1 ">
+        <Pressable className="flex-1 flex-col bg-white rounded-sm m-1">
+          <View>
           <Image
             // source={{ uri: item?.image[0] }}
             source={require('../../assets/images/test3.jpeg')}
             // className="w-full h-auto rounded-t-lg object-cover"
             style={{
               width: '100%',
-              height: 100,
+              height: '100%',
               borderTopLeftRadius: 8,
               borderTopRightRadius: 8,
+              minHeight: 200,
             }}
             resizeMode="cover"
           />
+          </View>
           <View className="mx-2 mt-2 mb-3">
             <Text className="font-medium text-sm line-clamp-2">
               {item.title}
@@ -129,4 +132,4 @@ const IndexAll = () => {
   );
 };
 
-export default IndexAll;
+export default index_all;

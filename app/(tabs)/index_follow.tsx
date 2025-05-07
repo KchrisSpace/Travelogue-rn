@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 
-const IndexFollow = () => {
+const index_follow = () => {
   return (
     <View>
       <Text>关注</Text>
@@ -8,4 +8,4 @@ const IndexFollow = () => {
   );
 };
 
-export default IndexFollow;
+export default index_follow;
