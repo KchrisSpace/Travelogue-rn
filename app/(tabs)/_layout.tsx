@@ -1,19 +1,15 @@
-import { Tabs } from "expo-router";
-import React from "react";
-import { Platform } from "react-native";
-import { useThemeColor } from "@/hooks/useThemeColor";
-import { FontAwesome } from "@expo/vector-icons";
+import { useThemeColor } from '@/hooks/useThemeColor';
+import { FontAwesome } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
 
-import { HapticTab } from "@/components/HapticTab";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import TabBarBackground from "@/components/ui/TabBarBackground";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { HapticTab } from '@/components/HapticTab';
+import TabBarBackground from '@/components/ui/TabBarBackground';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const backgroundColor = useThemeColor({}, "background");
-  const tintColor = useThemeColor({}, "tint");
+  const backgroundColor = useThemeColor({}, 'background');
+  const tintColor = useThemeColor({}, 'tint');
 
   return (
     <Tabs
@@ -23,13 +19,12 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: { backgroundColor },
-      }}
-    >
+      }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: "首页",
-          tabBarIcon: ({ color }) => (
+          title: '首页',
+          tabBarIcon: ({ color }: { color: string }) => (
             <FontAwesome size={28} name="home" color={color} />
           ),
         }}
@@ -37,8 +32,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="travelogue"
         options={{
-          title: "发布游记",
-          tabBarIcon: ({ color }) => (
+          title: '发布游记',
+          tabBarIcon: ({ color }: { color: string }) => (
             <FontAwesome size={28} name="plus-square" color={color} />
           ),
         }}
@@ -46,7 +41,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "我的",
+          title: '我的',
           tabBarIcon: ({ color }) => (
             <FontAwesome size={28} name="user" color={color} />
           ),
