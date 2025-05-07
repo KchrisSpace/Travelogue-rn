@@ -66,6 +66,18 @@ export default function TabLayout() {
           },
         }}
       />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Search",
+          tabBarIcon: ({ color }: { color: string }) => (
+            <FontAwesome size={28} name="search" color={color} />
+          ),
+          tabBarItemStyle: {
+            display: "none",
+          },
+        }}
+      />
     </Tabs>
   );
 }
