@@ -1,3 +1,5 @@
+import { StyleSheet, View } from "react-native";
+
 import { FontAwesome } from '@expo/vector-icons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { Link } from 'expo-router';
@@ -42,3 +44,10 @@ export default function HomeScreen() {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+});

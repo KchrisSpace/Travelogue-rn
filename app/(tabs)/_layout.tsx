@@ -1,41 +1,70 @@
-import { useThemeColor } from '@/hooks/useThemeColor';
-import { FontAwesome } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs, useRouter, useSegments } from "expo-router";
+import { useEffect } from "react";
+import { TouchableOpacity } from "react-native";
+import { useAuth } from "../../hooks/useAuth";
 
-import { HapticTab } from '@/components/HapticTab';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { useColorScheme } from '@/hooks/useColorScheme';
+function FilteredTouchableOpacity(props: any) {
+  const { onPress, ...rest } = props;
+  // 过滤掉 type/href 等属性
+  const filteredProps = Object.fromEntries(
+    Object.entries(rest).filter(([key]) => !["type", "href"].includes(key))
+  );
+  return (
+    <TouchableOpacity
+      {...filteredProps}
+      onPress={(e) => {
+        if (typeof e?.preventDefault === "function") e.preventDefault();
+        if (onPress) onPress(e);
+      }}
+    />
+  );
+}
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const backgroundColor = useThemeColor({}, 'background');
-  const tintColor = useThemeColor({}, 'tint');
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+  const segments = useSegments();
+  console.log("isAuthenticated", isAuthenticated);
+
+  useEffect(() => {
+    if (isLoading) return;
+    const inAuthGroup = segments[0] === "auth";
+    const inProtectedRoute = segments[0] === "publish";
+    if (!isAuthenticated && inProtectedRoute && !inAuthGroup) {
+      router.replace("/auth");
+    }
+  }, [isAuthenticated, segments, isLoading]);
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: tintColor,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: { backgroundColor },
-      }}
-    >
+    <Tabs>
       <Tabs.Screen
         name="index"
         options={{
           title: "首页",
-          tabBarIcon: ({ color }: { color: string }) => (
-            <FontAwesome size={28} name="home" color={color} />
+          tabBarIcon: ({ color, size }: { color: string }) => (
+            <Ionicons name="home" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="travelogue"
+        name="publish"
         options={{
-          title: "发布游记",
-          tabBarIcon: ({ color }: { color: string }) => (
-            <FontAwesome size={28} name="plus-square" color={color} />
+          title: "发布",
+          tabBarIcon: ({ color, size }: { color: string }) => (
+            <Ionicons name="add-circle" size={size} color={color} />
+          ),
+          tabBarButton: (props) => (
+            <FilteredTouchableOpacity
+              {...props}
+              onPress={() => {
+                if (!isAuthenticated) {
+                  router.replace("/auth");
+                } else {
+                  return;
+                }
+              }}
+            />
           ),
         }}
       />
@@ -43,8 +72,9 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "我的",
-          tabBarIcon: ({ color }: { color: string }) => (
-            <FontAwesome size={28} name="user" color={color} />
+          headerShown: false,
+          tabBarIcon: ({ color, size }: { color: string }) => (
+            <Ionicons name="person" size={size} color={color} />
           ),
         }}
       />

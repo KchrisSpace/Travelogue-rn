@@ -1,0 +1,131 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import React, { createContext, useContext, useEffect, useState } from "react";
+
+interface User {
+  id: string;
+  password: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  login: (id: string, password: string) => Promise<void>;
+  register: (id: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // 从 AsyncStorage 加载用户数据
+    loadUser();
+    // TODO: 检查本地存储的token
+    checkAuthStatus();
+  }, []);
+
+  const loadUser = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("user");
+      if (userData) {
+        setUser(JSON.parse(userData));
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      setUser(null);
+      setIsAuthenticated(false);
+      console.error("Error loading user:", error);
+    }
+  };
+
+  const checkAuthStatus = async () => {
+    try {
+      // TODO: 验证token有效性
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+  };
+
+  const login = async (id: string, password: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/user?id=${id}`);
+      const users = await response.json();
+      if (!users || users.length === 0) {
+        throw new Error("用户不存在");
+      }
+      const user = users[0];
+      if (user.password !== password) {
+        throw new Error("密码错误");
+      }
+      await AsyncStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+      setIsAuthenticated(true);
+      router.replace("/(tabs)");
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const register = async (id: string, password: string) => {
+    try {
+      // 检查id是否已存在
+      const response = await fetch(`http://localhost:3000/user?id=${id}`);
+      const users = await response.json();
+      if (users && users.length > 0) {
+        throw new Error("该账号已存在");
+      }
+      // 写入新用户
+      const newUser = { id, password };
+      await fetch("http://localhost:3000/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+      // 注册成功后自动登录
+      await AsyncStorage.setItem("user", JSON.stringify(newUser));
+      setUser(newUser);
+      setIsAuthenticated(true);
+      router.replace("/(tabs)");
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await AsyncStorage.removeItem("user");
+      setUser(null);
+      setIsAuthenticated(false);
+      router.replace("/auth/login");
+    } catch (error) {
+      console.error("Error removing user:", error);
+      throw error;
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{ user, login, register, logout, isAuthenticated, isLoading }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
