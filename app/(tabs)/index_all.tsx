@@ -71,8 +71,11 @@ const Index_all = () => {
         }}
         onEndReachedThreshold={0.3}
         renderItem={({ item }) => (
-          <Pressable className="flex-1 flex-col bg-white rounded-sm m-1">
-            <View>
+          <Pressable
+            className="flex-1 flex-col bg-white m-1"
+           
+          >
+            <View  style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
               <Image
                 // source={{ uri: item?.image[0] }}
                 source={require('../../assets/images/test3.jpeg')}
@@ -80,8 +83,6 @@ const Index_all = () => {
                 style={{
                   width: '100%',
                   height: '100%',
-                  borderTopLeftRadius: 8,
-                  borderTopRightRadius: 8,
                   minHeight: 200,
                 }}
                 resizeMode="cover"

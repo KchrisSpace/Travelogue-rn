@@ -39,74 +39,71 @@ export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen
-        name="index"
-        options={{
-          title: "首页",
-          tabBarIcon: ({ color, size }: { color: string }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-        }}
+      name="index"
+      options={{
+        title: "首页",
+        tabBarIcon: ({ color, size }: { color: string }) => (
+        <Ionicons name="home" size={size} color={color} />
+        ),
+      }}
       />
       <Tabs.Screen
-        name="publish"
-        options={{
-          title: "发布",
-          tabBarIcon: ({ color, size }: { color: string }) => (
-            <Ionicons name="add-circle" size={size} color={color} />
-          ),
-          tabBarButton: (props) => (
-            <FilteredTouchableOpacity
-              {...props}
-              onPress={() => {
-                if (!isAuthenticated) {
-                  router.replace("/auth");
-                } else {
-                  return;
-                }
-              }}
-            />
-          ),
-        }}
+      name="publish"
+      options={{
+        title: "发布",
+        tabBarIcon: ({ color, size }: { color: string }) => (
+        <Ionicons name="add-circle" size={size} color={color} />
+        ),
+        tabBarButton: (props) => (
+        <FilteredTouchableOpacity
+          {...props}
+          onPress={() => {
+          if (!isAuthenticated) {
+            router.replace("/auth");
+          } else {
+            return;
+          }
+          }}
+        />
+        ),
+      }}
       />
       <Tabs.Screen
-        name="profile"
-        options={{
-          title: "我的",
-          headerShown: false,
-          tabBarIcon: ({ color, size }: { color: string }) => (
-            <Ionicons name="person" size={size} color={color} />
-          ),
-        }}
+      name="profile"
+      options={{
+        title: "我的",
+        headerShown: false,
+        tabBarIcon: ({ color, size }: { color: string }) => (
+        <Ionicons name="person" size={size} color={color} />
+        ),
+      }}
       />
       <Tabs.Screen
-        name="index_all"
-        options={{
-          title: "All",
-          tabBarItemStyle: {
-            display: "none",
-          },
-        }}
+      name="index_all"
+      options={{
+        title: "All",
+        tabBarItemStyle: {
+        display: "none",
+        },
+      }}
       />
       <Tabs.Screen
-        name="index_follow"
-        options={{
-          title: "Follow",
-          tabBarItemStyle: {
-            display: "none",
-          },
-        }}
+      name="index_follow"
+      options={{
+        title: "Follow",
+        tabBarItemStyle: {
+        display: "none",
+        },
+      }}
       />
       <Tabs.Screen
-        name="search"
-        options={{
-          title: "Search",
-          tabBarIcon: ({ color }: { color: string }) => (
-            <FontAwesome size={28} name="search" color={color} />
-          ),
-          tabBarItemStyle: {
-            display: "none",
-          },
-        }}
+      name="search"
+      options={{
+        title: "Search",
+        tabBarItemStyle: {
+        display: "none",
+        },
+      }}
       />
     </Tabs>
   );

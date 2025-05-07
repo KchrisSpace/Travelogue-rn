@@ -1,11 +1,15 @@
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { AppRegistry } from "react-native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import "react-native-reanimated";
 import { AuthProvider } from "../hooks/useAuth";
 import { AuthGuard } from "./components/AuthGuard";
-
+import '../global.css';
+// 创建一个 QueryClient 实例
+const queryClient = new QueryClient();
 export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),

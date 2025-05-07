@@ -1,4 +1,3 @@
-import { StyleSheet, View } from "react-native";
 
 import { FontAwesome } from '@expo/vector-icons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -45,9 +44,3 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-});
