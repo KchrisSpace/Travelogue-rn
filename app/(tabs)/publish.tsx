@@ -1,5 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   Button,
   Image,
@@ -11,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { ThemedText } from "../../components/ThemedText";
+import { useAuth } from "../../hooks/useAuth";
 import { useThemeColor } from "../../hooks/useThemeColor";
 
 const categories = [
@@ -20,12 +22,15 @@ const categories = [
 ];
 
 export default function PublishScreen() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [content, setContent] = useState("");
   const backgroundColor = useThemeColor({}, "background");
+ 
 
   const handleCategoryChange = (value: number) => {
     setSelectedCategories((prev) =>

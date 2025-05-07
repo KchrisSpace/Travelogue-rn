@@ -1,19 +1,40 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs, useRouter } from "expo-router";
+import { Tabs, useRouter, useSegments } from "expo-router";
+import { useEffect } from "react";
 import { TouchableOpacity } from "react-native";
 import { useAuth } from "../../hooks/useAuth";
 
 function FilteredTouchableOpacity(props: any) {
-  // 过滤掉props中为null的属性，避免类型报错
+  const { onPress, ...rest } = props;
+  // 过滤掉 type/href 等属性
   const filteredProps = Object.fromEntries(
-    Object.entries(props).filter(([_, v]) => v !== null)
+    Object.entries(rest).filter(([key]) => !["type", "href"].includes(key))
   );
-  return <TouchableOpacity {...filteredProps} />;
+  return (
+    <TouchableOpacity
+      {...filteredProps}
+      onPress={(e) => {
+        if (typeof e?.preventDefault === "function") e.preventDefault();
+        if (onPress) onPress(e);
+      }}
+    />
+  );
 }
 
 export default function TabLayout() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+  const segments = useSegments();
+  console.log("isAuthenticated", isAuthenticated);
+
+  useEffect(() => {
+    if (isLoading) return;
+    const inAuthGroup = segments[0] === "auth";
+    const inProtectedRoute = segments[0] === "publish";
+    if (!isAuthenticated && inProtectedRoute && !inAuthGroup) {
+      router.replace("/auth");
+    }
+  }, [isAuthenticated, segments, isLoading]);
 
   return (
     <Tabs>
@@ -37,13 +58,10 @@ export default function TabLayout() {
             <FilteredTouchableOpacity
               {...props}
               onPress={() => {
-                if (isAuthenticated) {
-                  console.log("isAuthenticated", isAuthenticated);
-                  router.push("/publish");
+                if (!isAuthenticated) {
+                  router.replace("/auth");
                 } else {
-                  // @ts-ignore
-
-                  router.push("/auth");
+                  return;
                 }
               }}
             />

@@ -16,7 +16,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!isAuthenticated && inProtectedRoute) {
       // 跳转到登录页，并带上来源参数
       router.replace({
-        pathname: "/auth/login",
+        pathname: "/auth",
         params: { redirect: "/publish" },
       });
     }
