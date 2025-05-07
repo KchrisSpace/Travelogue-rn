@@ -3,6 +3,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+import { router } from "expo-router";
 // import { DATA } from "./data";
 import { BASE_URL } from '../../const';
 
@@ -71,43 +72,41 @@ const Index_all = () => {
         }}
         onEndReachedThreshold={0.3}
         renderItem={({ item }) => (
-          <Pressable
+            <Pressable
             className="flex-1 flex-col bg-white m-1"
-           
-          >
-            <View  style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
+            onPress={() => router.push({ pathname: '/detail/[post_id]', params: { post_id: item?.id } })}
+            >
+            <View style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
               <Image
-                // source={{ uri: item?.image[0] }}
-                source={require('../../assets/images/test3.jpeg')}
-                // className="w-full h-auto rounded-t-lg object-cover"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  minHeight: 200,
-                }}
-                resizeMode="cover"
+              source={{ uri: item?.image[0] }}
+              style={{
+                width: '100%',
+                height: '100%',
+                minHeight: 200,
+              }}
+              resizeMode="cover"
               />
             </View>
             <View className="mx-2 mt-2 mb-3">
               <Text className="font-medium text-sm line-clamp-2">{item.title}</Text>
               <View className="flex flex-row items-center justify-start mt-2">
-                <Image
-                  source={require('../../assets/images/test3.jpeg')}
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 14,
-                    borderWidth: 1,
-                    borderColor: '#E0E0E0',
-                  }}
-                />
-                <View className="mx-2">
-                  <Text className="text-xs text-gray-600">{item.userName}</Text>
-                  <Text className="text-[10px] text-gray-400">03-21</Text>
-                </View>
+              <Image
+                source={{ uri: item.userAvatar }}
+                style={{
+                width: 28,
+                height: 28,
+                borderRadius: 14,
+                borderWidth: 1,
+                borderColor: '#E0E0E0',
+                }}
+              />
+              <View className="mx-2">
+                <Text className="text-xs text-gray-600">{item.userName}</Text>
+                <Text className="text-[10px] text-gray-400">03-21</Text>
+              </View>
               </View>
             </View>
-          </Pressable>
+            </Pressable>
         )}
         estimatedItemSize={300}
       />
