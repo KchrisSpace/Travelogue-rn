@@ -11,7 +11,7 @@ import {
 import { Favorite, useFavorite } from "../../hooks/useFavorite";
 import { Follow, useFollow } from "../../hooks/useFollow";
 import { Travelogue, useTravelogue } from "../../hooks/useTravelogue";
-import { useAuth } from "../context/auth";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function PersonalCenter() {
   const { user } = useAuth();
@@ -76,16 +76,14 @@ export default function PersonalCenter() {
                 }
                 style={styles.avatar}
               />
-              <TouchableOpacity style={styles.avatarEditBtn}>
-                <Text style={{ fontSize: 16, color: "#666" }}>✎</Text>
-              </TouchableOpacity>
             </View>
-            <View style={{ marginLeft: 16, marginBottom: 8 }}>
+            <View style={{ marginLeft: 16, marginBottom: 8, flexDirection: 'row', alignItems: 'center' }}>
               <Text style={styles.username}>
                 {(user as any)?.["user-info"]?.nickname || user?.id || "未登录"}
               </Text>
-              <Text style={styles.userTag}>@{user?.id || "未登录"}</Text>
+              <Text style={styles.userTag}> {user?.id || ""}</Text>
             </View>
+            
           </View>
           <View style={styles.statsRow}>
             <TouchableOpacity style={styles.statItem}>

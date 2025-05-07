@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAuth } from "../context/auth";
+import { useAuth } from "../../hooks/useAuth";
 
 interface User {
   id: string;

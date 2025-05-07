@@ -3,8 +3,8 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import "react-native-reanimated";
+import { AuthProvider } from "../hooks/useAuth";
 import { AuthGuard } from "./components/AuthGuard";
-import { AuthProvider } from "./context/auth";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -36,11 +36,18 @@ export default function RootLayout() {
           <Stack.Screen
             name="auth/login"
             options={{
-              headerShown: false,
+              headerShown: true,
               headerTitle: "",
             }}
           />
-           
+          <Stack.Screen
+            name="auth/register"
+            options={{
+              headerShown: true,
+              headerTitle: "",
+            }}
+          />
+
           <Stack.Screen
             name="publish"
             options={{

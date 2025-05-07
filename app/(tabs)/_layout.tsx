@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, useRouter } from "expo-router";
 import { TouchableOpacity } from "react-native";
-import { useAuth } from "../context/auth";
+import { useAuth } from "../../hooks/useAuth";
 
 function FilteredTouchableOpacity(props: any) {
   // 过滤掉props中为null的属性，避免类型报错

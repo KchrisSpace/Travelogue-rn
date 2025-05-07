@@ -1,6 +1,6 @@
 import { useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { useAuth } from "../context/auth";
+import { useAuth } from "../../hooks/useAuth";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
