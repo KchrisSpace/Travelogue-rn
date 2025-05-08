@@ -10,12 +10,12 @@ import { BASE_URL } from '../../const';
 // 定义 Note 接口，描述游记的结构
 interface Note {
   id: string;
-  userId: string;
+  user_id: string;
   image: string[];
   title: string;
-  userAvatar: string;
-  userName: string;
   status: string;
+  userAvatar?: string; // 添加可选的用户头像字段
+  userName?: string; // 添加可选的用户名字段
 }
 
 interface NotesResponse {
@@ -33,7 +33,7 @@ const fetchNotes = async ({
     params: {
       type: 'cursor',
       cursor: pageParam,
-      limit: 7,
+      limit: 4,
       status: 'approved',
     },
   });
@@ -72,7 +72,7 @@ const Index_all = () => {
   const allNotes = data?.pages.flatMap((page) => page.data) || [];
   console.log('allNotes', allNotes);
   return (
-    <View>
+    <View style={{ flex: 1, height: '100%' }}>
       <MasonryFlashList
         data={allNotes}
         numColumns={2}
@@ -88,11 +88,12 @@ const Index_all = () => {
 
           return (
             <Pressable
-              className="flex-1 flex-col bg-white m-1"
+              className="flex-1 flex-col bg-white m-1 rounded-lg overflow-hidden"
+              style={{ marginBottom: 8 }}
               onPress={() =>
                 router.push({
                   pathname: '/detail/[post_id]',
-                  params: { post_id: item?.id },
+                  params: { post_id: item?.id, user_id: item?.user_id },
                 })
               }>
               <View
@@ -116,7 +117,9 @@ const Index_all = () => {
                 </Text>
                 <View className="flex flex-row items-center justify-start mt-2">
                   <Image
-                    source={{ uri: item.userAvatar }}
+                    source={{
+                      uri: item.userAvatar || 'https://via.placeholder.com/28',
+                    }}
                     style={{
                       width: 28,
                       height: 28,
@@ -127,7 +130,7 @@ const Index_all = () => {
                   />
                   <View className="mx-2">
                     <Text className="text-xs text-gray-600">
-                      {item.userName}
+                      {item.userName || '匿名用户'}
                     </Text>
                     <Text className="text-[10px] text-gray-400">03-21</Text>
                   </View>
