@@ -5,22 +5,23 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function RegisterScreen() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const { register } = useAuth();
 
   const handleRegister = async () => {
     if (!id || !password || !confirmPassword) {
-      Alert.alert("错误", "请填写完整信息");
+      Alert.alert("错误", "请填写所有信息");
       return;
     }
     if (password !== confirmPassword) {
@@ -28,23 +29,9 @@ export default function RegisterScreen() {
       return;
     }
     try {
-      // 检查账号是否已存在
-      const checkRes = await fetch(`http://localhost:3000/user?id=${id}`);
-      const users = await checkRes.json();
-      if (users && users.length > 0) {
-        Alert.alert("错误", "该账号已存在");
-        return;
-      }
-      // 写入新用户
-      const newUser = { id, password };
-      await fetch("http://localhost:3000/user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
-      }); 
-      router.replace("/auth/login");
-    } catch (error) {
-      Alert.alert("注册失败", "请重试");
+      await register(id, password);
+    } catch (error: any) {
+      Alert.alert("注册失败", error.message || "请重试");
     }
   };
 
@@ -54,52 +41,58 @@ export default function RegisterScreen() {
       style={styles.container}
     >
       <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.title}>注册账号</Text>
-            <Text style={styles.subtitle}>请填写账号和密码</Text>
-          </View>
-
-          <View style={styles.form}>
-            <TextInput
-              style={styles.input}
-              placeholder="账号"
-              value={id}
-              onChangeText={setId}
-              autoCapitalize="none"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="密码"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="确认密码"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-            />
-
-            <TouchableOpacity
-              style={styles.registerButton}
-              onPress={handleRegister}
-            >
-              <Text style={styles.registerButtonText}>注册</Text>
-            </TouchableOpacity>
-
-            <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>已有账号？ </Text>
-              <TouchableOpacity onPress={() => router.push("/auth/login")}>
-                <Text style={styles.loginLink}>去登录</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+      <View style={styles.bgCircle1} />
+      <View style={styles.bgCircle2} />
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text style={styles.title}>注册账号</Text>
+          <Text style={styles.subtitle}>开启你的青春旅程</Text>
         </View>
-      </ScrollView>
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="账号"
+            value={id}
+            onChangeText={setId}
+            autoCapitalize="none"
+            placeholderTextColor="#b3e0f7"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="密码"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            placeholderTextColor="#b3e0f7"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="确认密码"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            placeholderTextColor="#b3e0f7"
+          />
+          <TouchableOpacity
+            style={styles.registerButton}
+            onPress={handleRegister}
+          >
+            <Text style={styles.registerButtonText}>注册</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>已经有账号？ </Text>
+          <TouchableOpacity
+            onPress={() => {
+              // 跳转到登录页
+              // @ts-ignore
+              if (typeof router !== "undefined") router.replace("/auth/login");
+            }}
+          >
+            <Text style={styles.loginLink}>去登录</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -107,49 +100,87 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#e6f6fb",
+    justifyContent: "center",
   },
-  scrollContent: {
-    flexGrow: 1,
+  bgCircle1: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: "#b3e0f7",
+    top: -80,
+    left: -80,
+    opacity: 0.3,
+  },
+  bgCircle2: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "#3bb3e6",
+    bottom: -60,
+    right: -60,
+    opacity: 0.22,
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 24,
     justifyContent: "center",
   },
   header: {
-    marginBottom: 40,
+    marginBottom: 36,
+    alignItems: "center",
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: "bold",
-    color: "#333",
-    marginBottom: 8,
+    color: "#3bb3e6",
+    marginBottom: 6,
+    letterSpacing: 2,
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
+    color: "#5ac8fa",
+    letterSpacing: 1,
   },
   form: {
-    gap: 16,
+    gap: 18,
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    padding: 24,
+    shadowColor: "#3bb3e6",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   input: {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#e6f6fb",
     padding: 16,
     borderRadius: 12,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#b3e0f7",
+    color: "#3bb3e6",
   },
   registerButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#3bb3e6",
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
     marginTop: 8,
+    shadowColor: "#3bb3e6",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 2,
   },
   registerButtonText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "700",
+    letterSpacing: 2,
   },
   loginContainer: {
     flexDirection: "row",
@@ -157,12 +188,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   loginText: {
-    color: "#666",
-    fontSize: 14,
+    color: "#5ac8fa",
+    fontSize: 15,
   },
   loginLink: {
-    color: "#007AFF",
-    fontSize: 14,
-    fontWeight: "600",
+    color: "#3bb3e6",
+    fontSize: 15,
+    fontWeight: "700",
+    marginLeft: 2,
   },
 });

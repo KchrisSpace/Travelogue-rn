@@ -51,6 +51,7 @@ export default function TabLayout() {
         name="publish"
         options={{
           title: "发布",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="add-circle" size={size} color={color} />
           ),
