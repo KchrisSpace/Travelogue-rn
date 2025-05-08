@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Image,
@@ -8,50 +9,131 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Favorite, useFavorite } from "../../hooks/useFavorite";
-import { Follow, useFollow } from "../../hooks/useFollow";
-import { Travelogue, useTravelogue } from "../../hooks/useTravelogue";
 import { useAuth } from "../../hooks/useAuth";
+import type { NoteDetail } from "../../services/noteService";
+import { getUserNotes } from "../../services/noteService";
+import type { UserInfo } from "../../services/userService";
+import {
+  getUserFans,
+  getUserFavorites,
+  getUserFollows,
+  getUserInfo,
+} from "../../services/userService";
 
 export default function PersonalCenter() {
   const { user } = useAuth();
-  const [travelogues, setTravelogues] = useState<Travelogue[]>([]);
-  const [followings, setFollowings] = useState<Follow[]>([]);
-  const [followers, setFollowers] = useState<Follow[]>([]);
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
-  const { getTravelogues } = useTravelogue();
-  const { getFollowings, getFollowers } = useFollow();
-  const { getFavorites } = useFavorite();
-
-  const currentUserId = user?.id;
+  const router = useRouter();
+  const [travelogues, setTravelogues] = useState<NoteDetail[]>([]);
+  const [followings, setFollowings] = useState<UserInfo[]>([]);
+  const [followers, setFollowers] = useState<UserInfo[]>([]);
+  const [favorites, setFavorites] = useState<NoteDetail[]>([]);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   useEffect(() => {
-    if (!currentUserId) return;
+    if (!user?.id) return;
+    // 获取用户详细信息、游记、关注、粉丝、收藏
     const fetchData = async () => {
       try {
-        // 只获取当前用户的游记
-        const [traveloguesData, followingsData, followersData, favoritesData] =
-          await Promise.all([
-            getTravelogues(currentUserId),
-            getFollowings(currentUserId),
-            getFollowers(currentUserId),
-            getFavorites(currentUserId),
-          ]);
-        setTravelogues(traveloguesData);
-        setFollowings(followingsData);
-        setFollowers(followersData);
-        setFavorites(favoritesData);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+        const [userInfoData, notes, follows, fans, favs] = await Promise.all([
+          getUserInfo(user.id),
+          getUserNotes(user.id),
+          getUserFollows(user.id),
+          getUserFans(user.id),
+          getUserFavorites(user.id),
+        ]);
+        console.log("notes:", notes); // 看看这里是不是数组
+        setUserInfo(userInfoData);
+        setTravelogues(Array.isArray(notes) ? notes : []);
+        setFollowings(Array.isArray(follows) ? follows : []);
+        setFollowers(Array.isArray(fans) ? fans : []);
+        setFavorites(Array.isArray(favs) ? favs : []);
+      } catch (e) {
+        // 可以做错误提示
+        setUserInfo(null);
+        setTravelogues([]);
+        setFollowings([]);
+        setFollowers([]);
+        setFavorites([]);
       }
     };
     fetchData();
-  }, [currentUserId]);
+  }, [user?.id]);
 
   const handleSettingsPress = () => {
     // TODO: 实现设置页面跳转
     console.log("Settings pressed");
   };
+
+  if (!user?.id) {
+    // 未登录时显示提示页
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#e6f7fb",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 28,
+            fontWeight: "bold",
+            color: "#38a3e0",
+            marginBottom: 12,
+          }}
+        >
+          您还未登录
+        </Text>
+        <Text style={{ color: "#38a3e0", fontSize: 16, marginBottom: 32 }}>
+          登录后即可发布游记
+        </Text>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#38a3e0",
+            borderRadius: 12,
+            paddingVertical: 16,
+            paddingHorizontal: 60,
+            marginBottom: 16,
+          }}
+          onPress={() => router.replace("/auth/login")}
+        >
+          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>
+            去登录
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            borderColor: "#38a3e0",
+            borderWidth: 2,
+            borderRadius: 12,
+            paddingVertical: 16,
+            paddingHorizontal: 60,
+            marginBottom: 16,
+          }}
+          onPress={() => router.replace("/auth/register")}
+        >
+          <Text style={{ color: "#38a3e0", fontWeight: "bold", fontSize: 20 }}>
+            去注册
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            borderColor: "#38a3e0",
+            borderWidth: 2,
+            borderRadius: 12,
+            paddingVertical: 16,
+            paddingHorizontal: 40,
+          }}
+          onPress={() => router.replace("/")}
+        >
+          <Text style={{ color: "#38a3e0", fontWeight: "bold", fontSize: 18 }}>
+            咱不登陆 先去大厅看看
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f3f4f6" }}>
@@ -70,32 +152,46 @@ export default function PersonalCenter() {
             <View style={styles.avatarWrap}>
               <Image
                 source={
-                  (user as any)?.["user-info"]?.avatar
+                  user && (user as any)["user-info"]?.avatar
                     ? { uri: (user as any)["user-info"].avatar }
                     : require("../../assets/images/avatar/image.png")
                 }
                 style={styles.avatar}
               />
             </View>
-            <View style={{ marginLeft: 16, marginBottom: 8, flexDirection: 'row', alignItems: 'center' }}>
+            <View
+              style={{
+                marginLeft: 16,
+                marginBottom: 8,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
               <Text style={styles.username}>
-                {(user as any)?.["user-info"]?.nickname || user?.id || "未登录"}
+                {(user && (user as any)["user-info"]?.nickname) ||
+                  user?.id ||
+                  "未登录"}
               </Text>
               <Text style={styles.userTag}> {user?.id || ""}</Text>
             </View>
-            
           </View>
           <View style={styles.statsRow}>
             <TouchableOpacity style={styles.statItem}>
-              <Text style={styles.statNum}>{followings.length}</Text>
+              <Text style={styles.statNum}>
+                {userInfo?.["user-info"]?.follow?.length || 0}
+              </Text>
               <Text style={styles.statLabel}>关注</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.statItem}>
-              <Text style={styles.statNum}>{followers.length}</Text>
+              <Text style={styles.statNum}>
+                {userInfo?.["user-info"]?.fans?.length || 0}
+              </Text>
               <Text style={styles.statLabel}>粉丝</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.statItem}>
-              <Text style={styles.statNum}>{favorites.length}</Text>
+              <Text style={styles.statNum}>
+                {userInfo?.favorite?.length || 0}
+              </Text>
               <Text style={styles.statLabel}>收藏</Text>
             </TouchableOpacity>
           </View>
@@ -108,17 +204,25 @@ export default function PersonalCenter() {
         {/* 我的游记 */}
         <View style={styles.travelogueSection}>
           <Text style={styles.travelogueTitle}>我的游记</Text>
-          {travelogues.map((item) => (
-            <View key={item.id} style={styles.travelogueItem}>
-              <View>
-                <Text style={styles.travelogueItemTitle}>{item.title}</Text>
-                <Text style={styles.travelogueItemDate}>{item.date}</Text>
+          {Array.isArray(travelogues) && travelogues.length > 0 ? (
+            travelogues.map((item) => (
+              <View key={item.id} style={styles.travelogueItem}>
+                <View>
+                  <Text style={styles.travelogueItemTitle}>{item.title}</Text>
+                  <Text style={styles.travelogueItemDate}>
+                    {item.createdAt}
+                  </Text>
+                </View>
+                <TouchableOpacity style={styles.viewBtn}>
+                  <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                    查看
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.viewBtn}>
-                <Text style={{ color: "#fff", fontWeight: "bold" }}>查看</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+            ))
+          ) : (
+            <Text style={{ color: "#888", textAlign: "center" }}>暂无游记</Text>
+          )}
         </View>
       </ScrollView>
     </View>

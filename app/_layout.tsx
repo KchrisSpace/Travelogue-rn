@@ -1,11 +1,15 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
+import { AppRegistry } from "react-native";
 import "react-native-reanimated";
+import '../global.css';
 import { AuthProvider } from "../hooks/useAuth";
 import { AuthGuard } from "./components/AuthGuard";
-
+// 创建一个 QueryClient 实例
+const queryClient = new QueryClient();
 export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -17,19 +21,24 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider
+         >
       <AuthGuard>
-        <Stack>
-          <Stack.Screen
+            <Stack>
+              <Stack.Screen
             name="(tabs)"
             options={{
               headerShown: false,
+              headerTransparent: true,
             }}
           />
-          <Stack.Screen
-            name="auth"
+              <Stack.Screen name="detail/post_detail" options={{ headerShown: false, headerTransparent: true }} />
+            <Stack.Screen
+            name="auth/index"
             options={{
               headerShown: false,
+              headerTransparent: true,
             }}
           />
           <Stack.Screen
@@ -37,6 +46,7 @@ export default function RootLayout() {
             options={{
               headerShown: true,
               headerTitle: "",
+              headerTransparent: true,
             }}
           />
           <Stack.Screen
@@ -44,6 +54,7 @@ export default function RootLayout() {
             options={{
               headerShown: true,
               headerTitle: "",
+              headerTransparent: true,
             }}
           />
 
@@ -52,11 +63,15 @@ export default function RootLayout() {
             options={{
               headerShown: true,
               title: "发布游记",
+              headerTransparent: true,
             }}
           />
-        </Stack>
+            </Stack>
       </AuthGuard>
-      <StatusBar style="auto" />
-    </AuthProvider>
+          <StatusBar style="auto" />
+        </AuthProvider>
+      </QueryClientProvider>
   );
 }
+
+AppRegistry.registerComponent('YourAppName', () => RootLayout);

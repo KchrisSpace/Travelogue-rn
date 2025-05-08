@@ -30,11 +30,17 @@ export default function TabLayout() {
   useEffect(() => {
     if (isLoading) return;
     const inAuthGroup = segments[0] === "auth";
-    const inProtectedRoute = segments[0] === "publish";
+    const inProtectedRoute = ["publish", "profile"].includes(segments[0]);
     if (!isAuthenticated && inProtectedRoute && !inAuthGroup) {
       router.replace("/auth");
     }
   }, [isAuthenticated, segments, isLoading]);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/auth?redirect=/publish");
+    }
+  }, [isAuthenticated, isLoading]);
 
   return (
     <Tabs>
@@ -42,7 +48,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "首页",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
         }}
@@ -60,9 +66,9 @@ export default function TabLayout() {
               {...props}
               onPress={() => {
                 if (!isAuthenticated) {
-                  router.replace("/auth");
+                  router.push("/auth?redirect=/publish");
                 } else {
-                  return;
+                  router.push("/publish");
                 }
               }}
             />
@@ -74,9 +80,36 @@ export default function TabLayout() {
         options={{
           title: "我的",
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="index_all"
+        options={{
+          title: "All",
+          tabBarItemStyle: {
+            display: "none",
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="index_follow"
+        options={{
+          title: "Follow",
+          tabBarItemStyle: {
+            display: "none",
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Search",
+          tabBarItemStyle: {
+            display: "none",
+          },
         }}
       />
     </Tabs>

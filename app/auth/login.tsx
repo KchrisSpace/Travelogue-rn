@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 18,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff90",
     borderRadius: 18,
     padding: 24,
     shadowColor: "#3bb3e6",

@@ -22,7 +22,7 @@ const categories = [
 ];
 
 export default function PublishScreen() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
   const [title, setTitle] = useState("");
@@ -30,7 +30,12 @@ export default function PublishScreen() {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [content, setContent] = useState("");
   const backgroundColor = useThemeColor({}, "background");
- 
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/auth?redirect=/publish");
+    }
+  }, [isAuthenticated, isLoading]);
 
   const handleCategoryChange = (value: number) => {
     setSelectedCategories((prev) =>
@@ -51,8 +56,20 @@ export default function PublishScreen() {
   };
 
   const handleSubmit = () => {
+    if (!user) {
+      alert("请先登录");
+      router.replace("/auth?redirect=/publish");
+      return;
+    }
     // 只做本地打印，不请求任何接口
-    console.log({ image, title, location, selectedCategories, content });
+    console.log({
+      userId: user.id,
+      image,
+      title,
+      location,
+      selectedCategories,
+      content,
+    });
     alert("发布成功！（仅本地模拟）");
   };
 

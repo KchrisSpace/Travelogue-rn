@@ -1,10 +1,23 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { getUserInfo } from "../services/userService";
 
 interface User {
   id: string;
   password: string;
+  "user-info"?: {
+    avatar?: string;
+    nickname?: string;
+    gender?: string;
+    birthday?: string;
+    city?: string;
+    signature?: string;
+    follow?: string[];
+    fans?: string[];
+  };
+  favorite?: string[];
+  name?: string;
 }
 
 interface AuthContextType {
@@ -17,6 +30,8 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const BASE_URL = "http://localhost:3001";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -58,12 +73,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (id: string, password: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/user?id=${id}`);
-      const users = await response.json();
-      if (!users || users.length === 0) {
+      // 用userService的getUserInfo
+      const user = await getUserInfo(id);
+      console.log("user", user);
+      if (!user) {
         throw new Error("用户不存在");
       }
-      const user = users[0];
       if (user.password !== password) {
         throw new Error("密码错误");
       }
@@ -79,19 +94,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (id: string, password: string) => {
     try {
       // 检查id是否已存在
-      const response = await fetch(`http://localhost:3000/user?id=${id}`);
-      const users = await response.json();
-      if (users && users.length > 0) {
+      let userExists = false;
+      try {
+        await getUserInfo(id);
+        userExists = true;
+      } catch (e) {
+        userExists = false;
+      }
+      if (userExists) {
         throw new Error("该账号已存在");
       }
-      // 写入新用户
+      // 写入新用户（此处需你后端支持POST /api/user，若无则仅本地存储模拟）
       const newUser = { id, password };
-      await fetch("http://localhost:3000/user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
-      });
-      // 注册成功后自动登录
       await AsyncStorage.setItem("user", JSON.stringify(newUser));
       setUser(newUser);
       setIsAuthenticated(true);

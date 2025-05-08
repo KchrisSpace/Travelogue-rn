@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#e6f6fb",
     justifyContent: "center",
+    overflow: "hidden",
   },
   bgCircle1: {
     position: "absolute",
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 18,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff90",
     borderRadius: 18,
     padding: 24,
     shadowColor: "#3bb3e6",
