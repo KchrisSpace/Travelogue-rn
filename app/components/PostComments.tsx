@@ -94,9 +94,9 @@ const PostComments = ({
       </View>
 
       {/* 添加评论 */}
-      <View className="p-4 flex-row items-end border-t border-t-gray-200">
+      <View className="p-2 flex-row items-end border-t border-t-gray-200 sticky bottom-0 bg-white">
         <TextInput
-          className="flex-1 min-h-[40px] max-h-[100px] border border-gray-300 rounded-full px-4 py-2 text-sm"
+          className="flex-1 max-h-[40px] max-h-50px] border border-gray-300 rounded-full outline-none px-4 py-2 text-sm"
           placeholder="写下你的评论..."
           value={newComment}
           onChangeText={setNewComment}
@@ -106,7 +106,7 @@ const PostComments = ({
           className={`ml-2 ${
             !newComment.trim() || submittingComment
               ? 'bg-gray-400'
-              : 'bg-[#2089dc]'
+              : 'bg-[#F26371]'
           } rounded-full py-2 px-4 justify-center items-center`}
           onPress={handleSubmitComment}
           disabled={!newComment.trim() || submittingComment}>

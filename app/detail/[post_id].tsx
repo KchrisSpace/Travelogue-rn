@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Comment, NoteDetail, getNoteDetail } from '../../services/noteService';
 import { UserInfo, getUserInfo } from '../../services/userService';
+import PostAuthorHeader from '../components/PostAuthorHeader';
 import PostComments from '../components/PostComments';
 import PostContent from '../components/PostContent';
 import PostHeader from '../components/PostHeader';
@@ -24,6 +25,8 @@ const Detail = () => {
   const [commentUsers, setCommentUsers] = useState<Record<string, UserInfo>>(
     {}
   );
+  // 模拟当前登录用户ID，实际应从认证状态获取
+  const currentUserId = 'user1';
 
   // 获取游记详情
   useEffect(() => {
@@ -92,6 +95,21 @@ const Detail = () => {
     }
   };
 
+  const handleFollowPress = async () => {
+    if (!userInfo) return;
+
+    try {
+      // 这里应该调用关注/取消关注API
+      console.log(`${userInfo?.id} 关注状态已更改`);
+
+      // 模拟API成功响应，重新获取用户信息以更新关注状态
+      const updatedUserInfo = await getUserInfo(userInfo.id);
+      setUserInfo(updatedUserInfo);
+    } catch (error) {
+      console.error('更改关注状态失败', error);
+    }
+  };
+
   const handleCommentAdded = (newComment: Comment) => {
     if (!post) return;
 
@@ -137,24 +155,46 @@ const Detail = () => {
     <>
       <Stack.Screen
         options={{
-          title: '游记详情',
-          headerRight: () => (
-            <TouchableOpacity onPress={handleShare}>
-              <Ionicons name="share-outline" size={24} color="#2089dc" />
-            </TouchableOpacity>
-          ),
+          headerShown: false,
         }}
       />
 
       <ScrollView className="flex-1 bg-white">
+        {/* 作者信息和分享按钮 */}
+        <View className="px-4 pt-3 flex-row items-center justify-between">
+          {/* 返回按钮 */}
+          <TouchableOpacity
+            onPress={() => {
+              router.back();
+            }}
+            className="px-2 py-3 flex-row items-center">
+            <Ionicons
+              name="chevron-back"
+              size={24}
+              color="#ff4d67"
+              className="mr-2"
+            />
+            <PostAuthorHeader
+              userInfo={userInfo}
+              currentUserId={currentUserId}
+              onFollowPress={handleFollowPress}
+            />
+          </TouchableOpacity>
+          <View className="flex-row items-center">
+            <TouchableOpacity onPress={handleShare}>
+              <Ionicons name="share-outline" size={24} color="grey" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* 媒体展示区域 */}
         <PostMediaCarousel mediaList={post.image || []} />
 
-        {/* 标题和用户信息 */}
-        <PostHeader post={post} userInfo={userInfo} />
+        {/* 标题 */}
+        <PostHeader post={post} />
 
         {/* 内容区域 */}
-        <PostContent content={post.content} />
+        <PostContent content={post.content} userInfo={userInfo} post={post} />
 
         {/* 评论区域 */}
         <PostComments

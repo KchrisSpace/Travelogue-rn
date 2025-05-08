@@ -1,7 +1,6 @@
-
 import { FontAwesome } from '@expo/vector-icons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { Link } from 'expo-router';
+import { Link, Stack } from 'expo-router';
 import React from 'react';
 import { SafeAreaView, ScrollView } from 'react-native';
 import index_all from './index_all';
@@ -13,17 +12,23 @@ const Tab = createMaterialTopTabNavigator();
 export default function HomeScreen() {
   return (
     <ScrollView className="bg-[#fbf9fa]">
-      <SafeAreaView>
+      <Stack.Screen
+        options={{
+          headerShown: false,
+        }}
+      />
+      <SafeAreaView className="pt-10">
         <Tab.Navigator
           screenOptions={{
             tabBarLabelStyle: { fontSize: 14 },
             tabBarItemStyle: { width: 60, marginBottom: 0 },
             tabBarStyle: {
               backgroundColor: 'white',
-
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'space-around',
+              elevation: 0, // 移除Android上的阴影
+              shadowOpacity: 0, // 移除iOS上的阴影
             },
             tabBarIndicatorStyle: {
               backgroundColor: '#F26371',
@@ -43,4 +48,3 @@ export default function HomeScreen() {
     </ScrollView>
   );
 }
-
