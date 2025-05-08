@@ -10,7 +10,7 @@ interface PostContentProps {
 
 const PostContent = ({ content, userInfo, post }: PostContentProps) => {
   return (
-    <View className="p-4">
+    <View className="p-4 border-b border-b-gray-200">
       {/* 内容 */}
       <Text className="text-base leading-6 text-gray-800">{content}</Text>
  {/* 发布时间 */}

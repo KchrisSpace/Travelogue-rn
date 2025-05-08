@@ -2,10 +2,11 @@ import { MasonryFlashList } from '@shopify/flash-list';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 // import { DATA } from "./data";
 import { BASE_URL } from '../../const';
+import { UserInfo, getUserInfo } from '../../services/userService';
 
 // 定义 Note 接口，描述游记的结构
 interface Note {
@@ -14,14 +15,18 @@ interface Note {
   image: string[];
   title: string;
   status: string;
-  userAvatar?: string; // 添加可选的用户头像字段
-  userName?: string; // 添加可选的用户名字段
+  createdAt: string;
 }
 
 interface NotesResponse {
   data: Note[];
   nextCursor: string;
   hasMore: boolean;
+}
+
+// 添加带有用户信息的扩展Note接口
+interface NoteWithUserInfo extends Note {
+  userInfo?: UserInfo;
 }
 
 const fetchNotes = async ({
@@ -43,6 +48,10 @@ const fetchNotes = async ({
 };
 
 const Index_all = () => {
+  const [notesWithUserInfo, setNotesWithUserInfo] = useState<
+    NoteWithUserInfo[]
+  >([]);
+
   const {
     data,
     fetchNextPage,
@@ -56,11 +65,59 @@ const Index_all = () => {
     queryFn: fetchNotes,
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => {
-      // console.log(lastPage);
       return lastPage.hasMore ? lastPage.nextCursor : undefined;
     },
     staleTime: 1000 * 60 * 1,
   });
+
+  // 当笔记数据变化时，获取用户信息
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (!data) return;
+
+      const allNotes = data.pages.flatMap((page) => page.data);
+      const notesWithInfo: NoteWithUserInfo[] = [...allNotes];
+
+      // 获取所有不重复的用户ID
+      const userIds = [...new Set(allNotes.map((note) => note.user_id))];
+
+      // 批量获取用户信息
+      try {
+        const promises = userIds.map(async (userId) => {
+          try {
+            return await getUserInfo(userId);
+          } catch (error) {
+            console.error(`获取用户信息失败: ${userId}`, error);
+            return null;
+          }
+        });
+
+        const userInfoResults = await Promise.all(promises);
+
+        // 创建用户ID到用户信息的映射
+        const userInfoMap: Record<string, UserInfo> = {};
+        userInfoResults.forEach((info) => {
+          if (info) {
+            userInfoMap[info.id] = info;
+          }
+        });
+
+        // 将用户信息添加到笔记中
+        const updatedNotes = notesWithInfo.map((note) => {
+          return {
+            ...note,
+            userInfo: userInfoMap[note.user_id],
+          };
+        });
+
+        setNotesWithUserInfo(updatedNotes);
+      } catch (error) {
+        console.error('获取用户信息失败', error);
+      }
+    };
+
+    fetchUserInfo();
+  }, [data]);
 
   if (isLoading) return <Text className="text-center py-4">加载中...</Text>;
   if (isError)
@@ -69,12 +126,11 @@ const Index_all = () => {
         加载失败: {error.message}
       </Text>
     );
-  const allNotes = data?.pages.flatMap((page) => page.data) || [];
-  console.log('allNotes', allNotes);
+
   return (
     <View style={{ flex: 1, height: '100%' }}>
       <MasonryFlashList
-        data={allNotes}
+        data={notesWithUserInfo}
         numColumns={2}
         onEndReached={() => {
           if (hasNextPage && !isFetchingNextPage) {
@@ -85,6 +141,20 @@ const Index_all = () => {
         renderItem={({ item }) => {
           // 随机高度，范围100-250之间
           const imageHeight = 100 + Math.floor(Math.random() * 150);
+
+          // 获取用户信息
+          const avatar =
+            item.userInfo?.['user-info']?.avatar ||
+            'https://via.placeholder.com/28';
+          const nickname = item.userInfo?.['user-info']?.nickname || 'momo';
+
+          // 格式化日期
+          const createdDate = item.createdAt
+            ? new Date(item.createdAt).toLocaleDateString('zh-CN', {
+                month: '2-digit',
+                day: '2-digit',
+              })
+            : '';
 
           return (
             <Pressable
@@ -117,9 +187,7 @@ const Index_all = () => {
                 </Text>
                 <View className="flex flex-row items-center justify-start mt-2">
                   <Image
-                    source={{
-                      uri: item.userAvatar || 'https://via.placeholder.com/28',
-                    }}
+                    source={{ uri: avatar }}
                     style={{
                       width: 28,
                       height: 28,
@@ -129,10 +197,10 @@ const Index_all = () => {
                     }}
                   />
                   <View className="mx-2">
-                    <Text className="text-xs text-gray-600">
-                      {item.userName || '匿名用户'}
+                    <Text className="text-xs text-gray-600">{nickname}</Text>
+                    <Text className="text-[10px] text-gray-400">
+                      {createdDate}
                     </Text>
-                    <Text className="text-[10px] text-gray-400">03-21</Text>
                   </View>
                 </View>
               </View>

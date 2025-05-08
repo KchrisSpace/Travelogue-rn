@@ -6,7 +6,7 @@ interface PostHeaderProps {
 }
 const PostHeader = ({ post,}: PostHeaderProps) => {
   return (
-    <View className="px-4 pt-3 pb-4 border-b border-b-gray-200">
+    <View className="px-4 pt-3 pb-2">
       {/* 标题 */}
       <Text className="text-xl font-bold">{post?.title}</Text>
 

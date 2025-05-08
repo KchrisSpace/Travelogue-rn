@@ -68,16 +68,16 @@ const PostComments = ({
                 }}
                 className="w-9 h-9 rounded-full mr-2"
               />
-              <View className="flex-1 bg-gray-100 rounded-lg p-2.5">
+              <View className="flex-1 rounded-lg pb-2.5">
+                <Text className="text-xs text-gray-400">
+                  {commentUser?.['user-info']?.nickname || 'momo'}
+                </Text>
                 <View className="flex-row justify-between mb-1">
-                  <Text className="text-sm font-medium">
-                    {commentUser?.['user-info']?.nickname || '匿名用户'}
-                  </Text>
-                  <Text className="text-xs text-gray-400">
-                    {new Date(comment.createdAt).toLocaleString()}
-                  </Text>
+                  <Text className="text-sm leading-5">{comment.content}</Text>
                 </View>
-                <Text className="text-sm leading-5">{comment.content}</Text>
+                <Text className="text-xs text-gray-400">
+                  {new Date(comment.createdAt).toLocaleString()}
+                </Text>
               </View>
             </View>
           );
@@ -96,7 +96,7 @@ const PostComments = ({
       {/* 添加评论 */}
       <View className="p-2 flex-row items-end border-t border-t-gray-200 sticky bottom-0 bg-white">
         <TextInput
-          className="flex-1 max-h-[40px] max-h-50px] border border-gray-300 rounded-full outline-none px-4 py-2 text-sm"
+          className="flex-1 min-h-[40px] max-h-[50px] border border-gray-300 rounded-full outline-none px-4 py-2 text-sm"
           placeholder="写下你的评论..."
           value={newComment}
           onChangeText={setNewComment}

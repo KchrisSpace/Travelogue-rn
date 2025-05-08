@@ -24,7 +24,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({ post, userInfo }) => {
         />
         <View className="flex-1">
           <Text className="text-base font-medium">
-            {userInfo?.['user-info']?.nickname || '用户未知'}
+            {userInfo?.['user-info']?.nickname || 'momo'}
           </Text>
           <Text className="text-xs text-gray-500 mt-0.5">
             {post ? new Date(post.createdAt).toLocaleDateString() : ''}
