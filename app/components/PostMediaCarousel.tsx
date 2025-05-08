@@ -25,34 +25,47 @@ const PostMediaCarousel = ({ mediaList }: PostMediaCarouselProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { width } = Dimensions.get('window');
 
+  // 固定轮播图高度
+  const CAROUSEL_HEIGHT = 400;
+
   if (!mediaList || mediaList.length === 0) {
     return null;
   }
 
   return (
-    <View className="h-[300px] relative">
+    <View className="relative" style={{ height: CAROUSEL_HEIGHT }}>
       <Carousel
         width={width}
-        height={300}
+        height={CAROUSEL_HEIGHT}
         data={mediaList}
         mode="parallax"
         modeConfig={{
           parallaxScrollingScale: 0.9,
-          parallaxScrollingOffset: 50,
+          parallaxScrollingOffset: 0,
         }}
-        onSnapToItem={(index) => setCurrentImageIndex(index)}
+        onSnapToItem={(index) => {
+          setCurrentImageIndex(index);
+        }}
         renderItem={({ item, index }: CarouselRenderItemInfo) => {
           return (
             <TouchableOpacity
-              className="w-full h-[300px] relative"
+              style={{
+                width: '100%',
+                height: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
               onPress={() => {
                 setCurrentImageIndex(index);
                 setImageViewerVisible(true);
               }}>
               <Image
                 source={{ uri: item }}
-                className="w-full h-full"
-                resizeMode="cover"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  resizeMode: 'contain',
+                }}
               />
             </TouchableOpacity>
           );
@@ -65,7 +78,7 @@ const PostMediaCarousel = ({ mediaList }: PostMediaCarouselProps) => {
           <View
             key={i}
             className={`w-2 h-2 rounded-full mx-1 ${
-              currentImageIndex === i ? 'bg-[#2089dc]' : 'bg-gray-400'
+              currentImageIndex === i ? 'bg-[#ff4d67]' : 'bg-gray-400'
             }`}
           />
         ))}
