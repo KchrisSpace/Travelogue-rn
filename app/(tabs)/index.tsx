@@ -17,7 +17,7 @@ export default function HomeScreen() {
           headerShown: false,
         }}
       />
-      <SafeAreaView className="pt-10">
+      <SafeAreaView>
         <Tab.Navigator
           screenOptions={{
             tabBarLabelStyle: { fontSize: 14 },
