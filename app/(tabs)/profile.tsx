@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -64,88 +65,32 @@ export default function PersonalCenter() {
     console.log("Settings pressed");
   };
 
-  if (!user?.id) {
-    // 未登录时显示提示页
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "#e6f7fb",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 28,
-            fontWeight: "bold",
-            color: "#38a3e0",
-            marginBottom: 12,
-          }}
-        >
-          您还未登录
-        </Text>
-        <Text style={{ color: "#38a3e0", fontSize: 16, marginBottom: 32 }}>
-          登录后即可发布游记
-        </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#38a3e0",
-            borderRadius: 12,
-            paddingVertical: 16,
-            paddingHorizontal: 60,
-            marginBottom: 16,
-          }}
-          onPress={() => router.replace("/auth/login")}
-        >
-          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>
-            去登录
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            borderColor: "#38a3e0",
-            borderWidth: 2,
-            borderRadius: 12,
-            paddingVertical: 16,
-            paddingHorizontal: 60,
-            marginBottom: 16,
-          }}
-          onPress={() => router.replace("/auth/register")}
-        >
-          <Text style={{ color: "#38a3e0", fontWeight: "bold", fontSize: 20 }}>
-            去注册
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            borderColor: "#38a3e0",
-            borderWidth: 2,
-            borderRadius: 12,
-            paddingVertical: 16,
-            paddingHorizontal: 40,
-          }}
-          onPress={() => router.replace("/")}
-        >
-          <Text style={{ color: "#38a3e0", fontWeight: "bold", fontSize: 18 }}>
-            咱不登陆 先去大厅看看
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
   return (
-    <View style={{ flex: 1, backgroundColor: "#f3f4f6" }}>
+    <View style={{ flex: 1, backgroundColor: "#fdfeff" }}>
+      {/* 顶部蓝色渐变背景 */}
+      <LinearGradient
+        colors={["#38a3e0", "#a0e9ff"]}
+        style={styles.gradientCover}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+      />
       <TouchableOpacity
         style={styles.settingsButton}
         onPress={handleSettingsPress}
       >
-        <Ionicons name="settings-outline" size={24} color="#fff" />
+        <Ionicons name="settings-outline" size={24} color="#ffffff1" />
       </TouchableOpacity>
+      {/* 头像悬浮 */}
+      <View>
+        <Image
+          source={
+            user && (user as any)["user-info"]?.avatar
+              ? { uri: (user as any)["user-info"].avatar }
+              : require("../../assets/images/avatar/image.png")
+          }
+         />
+      </View>
       <ScrollView>
-        {/* 头部封面图 */}
-        <View style={styles.cover} />
         {/* 个人信息 */}
         <View style={styles.profileInfoWrap}>
           <View style={styles.profileRow}>
@@ -159,20 +104,16 @@ export default function PersonalCenter() {
                 style={styles.avatar}
               />
             </View>
-            <View
-              style={{
-                marginLeft: 16,
-                marginBottom: 8,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Text style={styles.username}>
-                {(user && (user as any)["user-info"]?.nickname) ||
-                  user?.id ||
-                  "未登录"}
+            <View style={styles.infoCol}>
+              <Text style={styles.nickname}>
+                {(user && (user as any)["user-info"]?.nickname) || "未设置昵称"}
               </Text>
-              <Text style={styles.userTag}> {user?.id || ""}</Text>
+              <Text style={styles.userid}>{user?.id ? `@${user.id}` : ""}</Text>
+              {user && (user as any)["user-info"]?.signature ? (
+                <Text style={styles.signature}>
+                  {(user as any)["user-info"].signature}
+                </Text>
+              ) : null}
             </View>
           </View>
           <View style={styles.statsRow}>
@@ -230,10 +171,13 @@ export default function PersonalCenter() {
 }
 
 const styles = StyleSheet.create({
-  cover: {
-    height: 120,
-    backgroundColor: "#d1d5db",
-    width: "100%",
+  gradientCover: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 160,
+    zIndex: 0,
   },
   settingsButton: {
     position: "absolute",
@@ -245,10 +189,10 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   profileInfoWrap: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: "#e2e7f0",
+    borderRadius: 20,
     marginHorizontal: 16,
-    marginTop: -40,
+    // marginTop: -40,
     padding: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -258,41 +202,39 @@ const styles = StyleSheet.create({
   },
   profileRow: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "center",
+    marginBottom: 8,
   },
   avatarWrap: {
-    position: "relative",
+    marginRight: 16,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 4,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderWidth: 3,
     borderColor: "#fff",
     backgroundColor: "#eee",
   },
-  avatarEditBtn: {
-    position: "absolute",
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 2,
-    elevation: 2,
+  infoCol: {
+    flex: 1,
+    justifyContent: "center",
   },
-  username: {
+  nickname: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#222",
+    marginBottom: 2,
   },
-  userTag: {
+  userid: {
+    fontSize: 15,
+    color: "#646567",
+    marginBottom: 2,
+  },
+  signature: {
     fontSize: 14,
-    color: "#888",
-    marginTop: 2,
+    color: "#38a3e0",
+     marginBottom: 2,
   },
   statsRow: {
     flexDirection: "row",
@@ -359,5 +301,11 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 16,
     paddingVertical: 8,
+  },
+  avatarFloatWrap: {
+    alignItems: "center",
+    marginTop: 40,
+    marginBottom: -30,
+    zIndex: 2,
   },
 });
