@@ -1,6 +1,6 @@
 import axios from 'axios';
+import { BASE_URL } from '../const';
 
-const API_BASE_URL = 'http://localhost:3001/api';
 
 // 用户信息接口
 export interface UserInfo {
@@ -22,7 +22,7 @@ export interface UserInfo {
 // 获取用户信息
 export const getUserInfo = async (userId: string): Promise<UserInfo> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/user?id=${userId}`);
+    const response = await axios.get(`${BASE_URL}/api/user?id=${userId}`);
     return response.data;
   } catch (error) {
     console.error('获取用户信息失败', error);

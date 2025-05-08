@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3001/api';
+import { BASE_URL } from '../const';
 
 // 评论接口
 export interface Comment {
@@ -25,7 +24,7 @@ export interface NoteDetail {
 // 获取游记详情
 export const getNoteDetail = async (noteId: string): Promise<NoteDetail> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/notedetail?id=${noteId}`);
+    const response = await axios.get(`${BASE_URL}/api/notedetail?id=${noteId}`);
     return response.data;
   } catch (error) {
     console.error('获取游记详情失败', error);
@@ -37,7 +36,7 @@ export const getNoteDetail = async (noteId: string): Promise<NoteDetail> => {
 export const getUserNotes = async (userId: string): Promise<NoteDetail[]> => {
   try {
     // 注意：这个API端点可能需要根据实际情况调整
-    const response = await axios.get(`${API_BASE_URL}/notes?user_id=${userId}`);
+    const response = await axios.get(`${BASE_URL}/api/notes?user_id=${userId}`);
     return response.data;
   } catch (error) {
     console.error('获取用户游记列表失败', error);
@@ -52,7 +51,7 @@ export const addComment = async (
   content: string
 ): Promise<Comment> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/comments`, {
+    const response = await axios.post(`${BASE_URL}/api/comments`, {
       noteId,
       userId,
       content,

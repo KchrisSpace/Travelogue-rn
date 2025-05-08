@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Video } from 'expo-av';
-import { Stack,useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -16,20 +16,12 @@ import {
 } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Carousel from 'react-native-reanimated-carousel';
-import { Comment, NoteDetail, getNoteDetail } from '../../services/noteService';
+import {
+  NoteDetail,
+  addComment,
+  getNoteDetail,
+} from '../../services/noteService';
 import { UserInfo, getUserInfo } from '../../services/userService';
-
-// 游记详情接口定义
-interface PostDetail {
-  id: string;
-  user_id: string;
-  title: string;
-  content: string;
-  image: string[];
-  video?: string; // 可选的视频URL
-  created_at: string;
-  updated_at: string;
-}
 
 type CarouselRenderItemInfo = {
   item: string;
@@ -127,17 +119,14 @@ const Detail = () => {
       // 假设当前登录用户ID为"user1"，实际应该从认证状态获取
       const currentUserId = 'user1';
 
-      // 在真实环境中调用API添加评论
-      // await addComment(post.id, currentUserId, newComment);
+      // 调用API添加评论
+      const newCommentObj = await addComment(
+        post.id,
+        currentUserId,
+        newComment
+      );
 
-      // 模拟添加评论，实际项目中应该刷新数据
-      const newCommentObj: Comment = {
-        id: `comment${Date.now()}`,
-        'user-id': currentUserId,
-        content: newComment,
-        createdAt: new Date().toISOString(),
-      };
-
+      // 评论添加成功后更新本地状态
       setPost({
         ...post,
         comments: [...post.comments, newCommentObj],
@@ -284,7 +273,7 @@ const Detail = () => {
         options={{
           title: '游记详情',
           headerRight: () => (
-            <TouchableOpacity onPress={handleShare} >
+            <TouchableOpacity onPress={handleShare}>
               <Ionicons name="share-outline" size={24} color="#2089dc" />
             </TouchableOpacity>
           ),
