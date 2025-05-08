@@ -1,9 +1,9 @@
 import { MasonryFlashList } from '@shopify/flash-list';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { router } from 'expo-router';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
-import { router } from "expo-router";
 // import { DATA } from "./data";
 import { BASE_URL } from '../../const';
 
@@ -43,21 +43,32 @@ const fetchNotes = async ({
 };
 
 const Index_all = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
-    useInfiniteQuery({
-      queryKey: ['notes'],
-      queryFn: fetchNotes,
-      initialPageParam: undefined,
-      getNextPageParam: (lastPage) => {
-        // console.log(lastPage);
-        return lastPage.hasMore ? lastPage.nextCursor : undefined;
-      },
-      staleTime: 1000 * 60 * 1,
-    });
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    error,
+  } = useInfiniteQuery({
+    queryKey: ['notes'],
+    queryFn: fetchNotes,
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => {
+      // console.log(lastPage);
+      return lastPage.hasMore ? lastPage.nextCursor : undefined;
+    },
+    staleTime: 1000 * 60 * 1,
+  });
 
   if (isLoading) return <Text className="text-center py-4">加载中...</Text>;
   if (isError)
-    return <Text className="text-center py-4 text-red-500">加载失败: {error.message}</Text>;
+    return (
+      <Text className="text-center py-4 text-red-500">
+        加载失败: {error.message}
+      </Text>
+    );
   const allNotes = data?.pages.flatMap((page) => page.data) || [];
   console.log('allNotes', allNotes);
   return (
@@ -71,43 +82,60 @@ const Index_all = () => {
           }
         }}
         onEndReachedThreshold={0.3}
-        renderItem={({ item }) => (
+        renderItem={({ item }) => {
+          // 随机高度，范围100-250之间
+          const imageHeight = 100 + Math.floor(Math.random() * 150);
+
+          return (
             <Pressable
-            className="flex-1 flex-col bg-white m-1"
-            onPress={() => router.push({ pathname: '/detail/[post_id]', params: { post_id: item?.id } })}
-            >
-            <View style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
-              <Image
-              source={{ uri: item?.image[0] }}
-              style={{
-                width: '100%',
-                height: '100%',
-                minHeight: 200,
-              }}
-              resizeMode="cover"
-              />
-            </View>
-            <View className="mx-2 mt-2 mb-3">
-              <Text className="font-medium text-sm line-clamp-2">{item.title}</Text>
-              <View className="flex flex-row items-center justify-start mt-2">
-              <Image
-                source={{ uri: item.userAvatar }}
+              className="flex-1 flex-col bg-white m-1"
+              onPress={() =>
+                router.push({
+                  pathname: '/detail/[post_id]',
+                  params: { post_id: item?.id },
+                })
+              }>
+              <View
                 style={{
-                width: 28,
-                height: 28,
-                borderRadius: 14,
-                borderWidth: 1,
-                borderColor: '#E0E0E0',
-                }}
-              />
-              <View className="mx-2">
-                <Text className="text-xs text-gray-600">{item.userName}</Text>
-                <Text className="text-[10px] text-gray-400">03-21</Text>
+                  borderTopLeftRadius: 8,
+                  borderTopRightRadius: 8,
+                  height: imageHeight,
+                }}>
+                <Image
+                  source={{ uri: item?.image[0] }}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                  }}
+                  resizeMode="cover"
+                />
               </View>
+              <View className="mx-2 mt-2 mb-3">
+                <Text className="font-medium text-sm line-clamp-2">
+                  {item.title}
+                </Text>
+                <View className="flex flex-row items-center justify-start mt-2">
+                  <Image
+                    source={{ uri: item.userAvatar }}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 14,
+                      borderWidth: 1,
+                      borderColor: '#E0E0E0',
+                    }}
+                  />
+                  <View className="mx-2">
+                    <Text className="text-xs text-gray-600">
+                      {item.userName}
+                    </Text>
+                    <Text className="text-[10px] text-gray-400">03-21</Text>
+                  </View>
+                </View>
               </View>
-            </View>
             </Pressable>
-        )}
+          );
+        }}
         estimatedItemSize={300}
       />
     </View>
