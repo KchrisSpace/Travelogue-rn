@@ -15,7 +15,7 @@ interface Note {
   image: string[];
   title: string;
   status: string;
-  createdAt: string;
+  created_at: string;
 }
 
 interface NotesResponse {
@@ -144,13 +144,13 @@ const Index_all = () => {
 
           // 获取用户信息
           const avatar =
-            item.userInfo?.['user-info']?.avatar ||
+            item.userInfo?.['user_info']?.avatar ||
             'https://via.placeholder.com/28';
-          const nickname = item.userInfo?.['user-info']?.nickname || 'momo';
+          const nickname = item.userInfo?.['user_info']?.nickname || 'momo';
 
           // 格式化日期
-          const createdDate = item.createdAt
-            ? new Date(item.createdAt).toLocaleDateString('zh-CN', {
+          const createdDate = item.created_at
+            ? new Date(item.created_at).toLocaleDateString('zh-CN', {
                 month: '2-digit',
                 day: '2-digit',
               })

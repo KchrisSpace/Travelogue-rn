@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { MasonryFlashList } from '@shopify/flash-list';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MasonryFlashList } from '@shopify/flash-list';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -24,7 +24,7 @@ interface SearchResult {
   description?: string;
   image: string[];
   type: 'post' | 'destination' | 'user';
-  createdAt?: string;
+  created_at?: string;
 }
 
 // 添加带有用户信息的扩展SearchResult接口
@@ -43,13 +43,16 @@ interface SearchBarProps {
   onBack: () => void;
 }
 
-const SearchBar = ({ searchText, setSearchText, handleSearch, onBack }: SearchBarProps) => {
+const SearchBar = ({
+  searchText,
+  setSearchText,
+  handleSearch,
+  onBack,
+}: SearchBarProps) => {
   return (
     <View className="flex-row items-center">
       {/* 返回按钮 */}
-      <TouchableOpacity
-        onPress={onBack}
-        className="px-2 flex-row items-center">
+      <TouchableOpacity onPress={onBack} className="px-2 flex-row items-center">
         <Ionicons
           name="chevron-back"
           size={24}
@@ -58,12 +61,7 @@ const SearchBar = ({ searchText, setSearchText, handleSearch, onBack }: SearchBa
         />
       </TouchableOpacity>
       <View className="flex-1 flex-row items-center bg-white rounded-lg px-3 py-2 mr-2 shadow-sm">
-        <Ionicons
-          name="search"
-          size={20}
-          color="#666"
-          className="mr-2"
-        />
+        <Ionicons name="search" size={20} color="#666" className="mr-2" />
         <TextInput
           className="flex-1 text-base text-gray-800 outline-none"
           placeholder="搜索目的地、游记、攻略..."
@@ -90,11 +88,11 @@ interface SearchSuggestionsProps {
   clearHistory: () => void;
 }
 
-const SearchSuggestions = ({ 
-  searchHistory, 
-  hotTopics, 
-  setSearchText, 
-  clearHistory 
+const SearchSuggestions = ({
+  searchHistory,
+  hotTopics,
+  setSearchText,
+  clearHistory,
 }: SearchSuggestionsProps) => {
   return (
     <ScrollView className="flex-1 mt-4">
@@ -146,12 +144,12 @@ const SearchResultItem = ({ item }: SearchResultItemProps) => {
   const imageHeight = 100 + Math.floor(Math.random() * 150);
 
   // 获取用户信息
-  const avatar = item.userInfo?.['user-info']?.avatar || `${BASE_URL}`;
-  const nickname = item.userInfo?.['user-info']?.nickname || 'momo';
+  const avatar = item.userInfo?.['user_info']?.avatar || `${BASE_URL}`;
+  const nickname = item.userInfo?.['user_info']?.nickname || 'momo';
 
   // 格式化日期
-  const createdDate = item.createdAt
-    ? new Date(item.createdAt).toLocaleDateString('zh-CN', {
+  const createdDate = item.created_at
+    ? new Date(item.created_at).toLocaleDateString('zh-CN', {
         month: '2-digit',
         day: '2-digit',
       })
@@ -166,9 +164,7 @@ const SearchResultItem = ({ item }: SearchResultItemProps) => {
           params: { post_id: item.id, user_id: item.user_id },
         })
       }>
-      <View
-        className="rounded-t-lg"
-        style={{ height: imageHeight }}>
+      <View className="rounded-t-lg" style={{ height: imageHeight }}>
         <Image
           source={{ uri: item.image[0] }}
           className="w-full h-full"
@@ -176,9 +172,7 @@ const SearchResultItem = ({ item }: SearchResultItemProps) => {
         />
       </View>
       <View className="mx-2 mt-2 mb-3">
-        <Text className="font-medium text-sm line-clamp-2">
-          {item.title}
-        </Text>
+        <Text className="font-medium text-sm line-clamp-2">{item.title}</Text>
         <View className="flex flex-row items-center justify-start mt-2">
           <Image
             source={{ uri: avatar }}
@@ -186,9 +180,7 @@ const SearchResultItem = ({ item }: SearchResultItemProps) => {
           />
           <View className="mx-2">
             <Text className="text-xs text-gray-600">{nickname}</Text>
-            <Text className="text-[10px] text-gray-400">
-              {createdDate}
-            </Text>
+            <Text className="text-[10px] text-gray-400">{createdDate}</Text>
           </View>
         </View>
       </View>
@@ -213,7 +205,9 @@ const SearchResults = ({ results }: SearchResultsProps) => {
         ListEmptyComponent={
           <View className="flex-1 justify-center items-center pt-12">
             <Ionicons name="search-outline" size={50} color="#ccc" />
-            <Text className="mt-4 text-gray-400 text-base">没有找到相关结果</Text>
+            <Text className="mt-4 text-gray-400 text-base">
+              没有找到相关结果
+            </Text>
           </View>
         }
       />
@@ -240,7 +234,7 @@ const EmptyResults = ({ searchText, onReset }: EmptyResultsProps) => {
       <Text className="mt-1 text-gray-400 text-base text-center px-8">
         请尝试其他关键词或浏览热门搜索
       </Text>
-      <TouchableOpacity 
+      <TouchableOpacity
         className="mt-6 bg-[#ff4d67] rounded-full py-2 px-6"
         onPress={onReset}>
         <Text className="text-white">返回搜索</Text>
@@ -264,7 +258,9 @@ const Search = () => {
   const [searchText, setSearchText] = useState('');
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [resultsWithUserInfo, setResultsWithUserInfo] = useState<SearchResultWithUserInfo[]>([]);
+  const [resultsWithUserInfo, setResultsWithUserInfo] = useState<
+    SearchResultWithUserInfo[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
@@ -315,7 +311,9 @@ const Search = () => {
       const resultsWithInfo: SearchResultWithUserInfo[] = [...searchResults];
 
       // 获取所有不重复的用户ID
-      const userIds = [...new Set(searchResults.map((result) => result.user_id))];
+      const userIds = [
+        ...new Set(searchResults.map((result) => result.user_id)),
+      ];
 
       // 批量获取用户信息
       try {
@@ -358,10 +356,10 @@ const Search = () => {
   // 更新搜索历史
   const updateSearchHistory = (keyword: string) => {
     // 如果历史中已经有这个关键词，先移除它
-    const filteredHistory = searchHistory.filter(item => item !== keyword);
+    const filteredHistory = searchHistory.filter((item) => item !== keyword);
     // 将新的关键词添加到历史的开头
     const newHistory = [keyword, ...filteredHistory].slice(0, 10);
-    
+
     setSearchHistory(newHistory);
     saveSearchHistory(newHistory);
   };

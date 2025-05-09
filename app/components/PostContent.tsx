@@ -15,7 +15,7 @@ const PostContent = ({ content, userInfo, post }: PostContentProps) => {
       <Text className="text-base leading-6 text-gray-800">{content}</Text>
  {/* 发布时间 */}
  <Text className="text-xs text-gray-500 mt-1.5">
-        {post ? new Date(post.createdAt).toLocaleDateString() : ''}
+        {post ? new Date(post.created_at).toLocaleDateString() : ''}
       </Text>
       {/* 用户签名 */}
       {/* {userInfo?.['user-info']?.signature && (

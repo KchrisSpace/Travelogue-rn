@@ -6,7 +6,7 @@ export interface UserInfo {
   id: string;
   name: string;
   password: string;
-  'user-info': {
+  'user_info': {
     avatar: string;
     nickname: string;
     gender: string;
@@ -33,7 +33,7 @@ export const getUserInfo = async (userId: string): Promise<UserInfo> => {
 export const getUserFollows = async (userId: string): Promise<UserInfo[]> => {
   try {
     const userInfo = await getUserInfo(userId);
-    const followIds = userInfo['user-info'].follow;
+    const followIds = userInfo['user_info'].follow;
 
     // 如果需要获取关注用户的详细信息，可以使用Promise.all批量请求
     const followUsers = await Promise.all(
@@ -51,7 +51,7 @@ export const getUserFollows = async (userId: string): Promise<UserInfo[]> => {
 export const getUserFans = async (userId: string): Promise<UserInfo[]> => {
   try {
     const userInfo = await getUserInfo(userId);
-    const fansIds = userInfo['user-info'].fans;
+    const fansIds = userInfo['user_info'].fans;
 
     // 如果需要获取粉丝用户的详细信息，可以使用Promise.all批量请求
     const fansUsers = await Promise.all(fansIds.map((id) => getUserInfo(id)));

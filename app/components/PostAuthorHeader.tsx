@@ -19,7 +19,7 @@ const PostAuthorHeader = ({
   useEffect(() => {
     if (userInfo && currentUserId) {
       const isAlreadyFollowing =
-        userInfo['user-info']?.fans?.includes(currentUserId);
+        userInfo['user_info']?.fans?.includes(currentUserId);
       setIsFollowing(!!isAlreadyFollowing);
     }
   }, [userInfo, currentUserId]);
@@ -40,12 +40,12 @@ const PostAuthorHeader = ({
       <Image
         source={{
           uri:
-            userInfo?.['user-info']?.avatar || 'https://via.placeholder.com/32',
+            userInfo?.['user_info']?.avatar || 'https://via.placeholder.com/32',
         }}
         className="w-12 h-12 rounded-full"
       />
       <Text className="ml-2 text-sm font-medium flex-1" numberOfLines={1}>
-        {userInfo?.['user-info']?.nickname || 'momo'}
+        {userInfo?.['user_info']?.nickname || 'momo'}
       </Text>
       <TouchableOpacity
         onPress={handleFollowPress}

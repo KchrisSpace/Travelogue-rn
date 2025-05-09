@@ -51,7 +51,7 @@ const Detail = () => {
         // 获取评论用户信息
         if (noteData.comments && noteData.comments.length > 0) {
           const commentUserIds = [
-            ...new Set(noteData.comments.map((comment) => comment['user-id'])),
+            ...new Set(noteData.comments.map((comment) => comment['user_id'])),
           ];
 
           try {
@@ -120,12 +120,12 @@ const Detail = () => {
     });
 
     // 如果没有此用户的信息，需要获取
-    if (!commentUsers[newComment['user-id']]) {
-      getUserInfo(newComment['user-id'])
+    if (!commentUsers[newComment['user_id']]) {
+      getUserInfo(newComment['user_id'])
         .then((userInfo) => {
           setCommentUsers({
             ...commentUsers,
-            [newComment['user-id']]: userInfo,
+            [newComment['user_id']]: userInfo,
           });
         })
         .catch((error) => {

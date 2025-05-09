@@ -4,9 +4,9 @@ import { BASE_URL } from '../const';
 // 评论接口
 export interface Comment {
   id: string;
-  'user-id': string;
+  user_id: string;
   content: string;
-  createdAt: string;
+  created_at: string;
 }
 
 // 游记详情接口
@@ -17,7 +17,7 @@ export interface NoteDetail {
   content: string;
   image: string[];
   status: string;
-  createdAt: string;
+  created_at: string;
   comments: Comment[];
 }
 

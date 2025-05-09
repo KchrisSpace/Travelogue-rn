@@ -56,27 +56,27 @@ const PostComments = ({
         <Text className="text-lg font-bold mb-4">评论 ({comments.length})</Text>
 
         {comments.map((comment) => {
-          const commentUser = commentUsers[comment['user-id']];
+          const commentUser = commentUsers[comment['user_id']];
 
           return (
             <View key={comment.id} className="flex-row mb-4">
               <Image
                 source={{
                   uri:
-                    commentUser?.['user-info']?.avatar ||
+                    commentUser?.['user_info']?.avatar ||
                     'https://via.placeholder.com/40',
                 }}
                 className="w-9 h-9 rounded-full mr-2"
               />
               <View className="flex-1 rounded-lg pb-2.5">
                 <Text className="text-xs text-gray-400">
-                  {commentUser?.['user-info']?.nickname || 'momo'}
+                  {commentUser?.['user_info']?.nickname || 'momo'}
                 </Text>
                 <View className="flex-row justify-between mb-1">
                   <Text className="text-sm leading-5">{comment.content}</Text>
                 </View>
                 <Text className="text-xs text-gray-400">
-                  {new Date(comment.createdAt).toLocaleString()}
+                  {new Date(comment.created_at).toLocaleString()}
                 </Text>
               </View>
             </View>
