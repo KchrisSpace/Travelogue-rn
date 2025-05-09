@@ -25,7 +25,7 @@ export default function RootLayout() {
         <AuthProvider
          >
       <AuthGuard>
-            <Stack>
+            <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen
             name="(tabs)"
             options={{
@@ -60,6 +60,12 @@ export default function RootLayout() {
             options={{
               headerShown: true,
               title: "发布游记",
+            }}
+          />
+          <Stack.Screen
+            name="search"
+            options={{
+              headerShown: false,
             }}
           />
             </Stack>

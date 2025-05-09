@@ -96,7 +96,7 @@ export default function TabLayout() {
         },
       }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
       name="search"
       options={{
         title: "Search",
@@ -104,7 +104,7 @@ export default function TabLayout() {
         display: "none",
         },
       }}
-      />
+      /> */}
     </Tabs>
   );
 }
