@@ -76,12 +76,12 @@ export default function PersonalCenter() {
       />
       <TouchableOpacity
         style={styles.settingsButton}
-        onPress={handleSettingsPress}
+        onPress={() => router.push("/setting")}
       >
         <Ionicons name="settings-outline" size={24} color="#ffffff1" />
       </TouchableOpacity>
       {/* 头像悬浮 */}
-      
+
       <ScrollView>
         {/* 个人信息 */}
         <View style={styles.profileInfoWrap}>
@@ -130,7 +130,10 @@ export default function PersonalCenter() {
               <Text style={styles.statLabel}>收藏</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.editBtn}>
+          <TouchableOpacity
+            style={styles.editBtn}
+            onPress={() => router.push("/profile-edit")}
+          >
             <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
               编辑个人资料
             </Text>

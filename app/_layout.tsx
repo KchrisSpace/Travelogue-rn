@@ -36,6 +36,9 @@ export default function RootLayout() {
               name="detail/[post_id]"
               options={{ headerShown: false, headerTransparent: true }}
             />
+           
+         
+           
             <Stack.Screen
               name="auth/index"
               options={{

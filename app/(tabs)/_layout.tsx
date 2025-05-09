@@ -101,6 +101,7 @@ export default function TabLayout() {
         name="search"
         options={{
           title: "Search",
+          headerShown: false,
           tabBarItemStyle: {
             display: "none",
           },
