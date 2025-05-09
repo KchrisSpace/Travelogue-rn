@@ -75,7 +75,7 @@ export const followUser = async (
     });
     console.log('关注成功:', response.data.message || '关注成功');
     return response.data.success || true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('关注失败:', error.response?.data?.error || error.message);
 
     // 暂时模拟成功，实际项目中应该抛出错误
@@ -87,20 +87,40 @@ export const followUser = async (
 // 取消关注用户
 export const unfollowUser = async (
   userId: string,
-  targetUserId: string
+  followId: string
 ): Promise<boolean> => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/unfollow`, {
-      userId,
-      targetUserId,
+    const response = await axios.delete(`${BASE_URL}/api/follow`, {
+      data: { userId, followId },
     });
-    return response.data.success;
-  } catch (error) {
-    console.error('取消关注失败', error);
-
-    // 暂时模拟成功，实际项目中应该抛出错误
-    console.log('模拟取消关注成功');
+    console.log('取消关注成功:', response.data.message);
     return true;
+  } catch (error: any) {
+    console.error(
+      '取消关注失败:',
+      error.response?.data?.error || error.message
+    );
+    return false;
+  }
+};
+
+// 检查用户是否已关注另一个用户
+export const checkIfFollowing = async (
+  userId: string,
+  followId: string
+): Promise<boolean> => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/follow`, {
+      params: {
+        userId,
+        followId,
+      },
+    });
+    console.log(response.data.isFollowing ? '已关注' : '未关注');
+    return response.data.isFollowing;
+  } catch (error: any) {
+    console.error('查询关注状态失败:', error.response?.data || error.message);
+    return false;
   }
 };
 
@@ -110,4 +130,5 @@ export default {
   getUserFans,
   followUser,
   unfollowUser,
+  checkIfFollowing,
 };

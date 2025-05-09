@@ -10,7 +10,13 @@ import {
   View,
 } from 'react-native';
 import { Comment, NoteDetail, getNoteDetail } from '../../services/noteService';
-import { UserInfo, getUserInfo } from '../../services/userService';
+import {
+  UserInfo,
+  checkIfFollowing,
+  followUser,
+  getUserInfo,
+  unfollowUser,
+} from '../../services/userService';
 import PostAuthorHeader from '../components/PostAuthorHeader';
 import PostComments from '../components/PostComments';
 import PostContent from '../components/PostContent';
@@ -22,6 +28,8 @@ const Detail = () => {
   const [loading, setLoading] = useState(true);
   const [post, setPost] = useState<NoteDetail | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
   const [commentUsers, setCommentUsers] = useState<Record<string, UserInfo>>(
     {}
   );
@@ -43,6 +51,19 @@ const Detail = () => {
           try {
             const authorInfo = await getUserInfo(noteData.user_id);
             setUserInfo(authorInfo);
+
+            // 检查当前用户是否已关注作者
+            if (currentUserId && authorInfo.id) {
+              try {
+                const followStatus = await checkIfFollowing(
+                  currentUserId,
+                  authorInfo.id
+                );
+                setIsFollowing(followStatus);
+              } catch (error) {
+                console.error('检查关注状态失败:', error);
+              }
+            }
           } catch (error) {
             console.error('获取作者信息失败', error);
           }
@@ -79,7 +100,7 @@ const Detail = () => {
     };
 
     fetchNoteDetail();
-  }, [post_id]);
+  }, [post_id, currentUserId]);
 
   const handleShare = async () => {
     if (!post) return;
@@ -96,17 +117,34 @@ const Detail = () => {
   };
 
   const handleFollowPress = async () => {
-    if (!userInfo) return;
+    if (!userInfo || !userInfo.id || followLoading) return;
 
     try {
-      // 这里应该调用关注/取消关注API
-      console.log(`${userInfo?.id} 关注状态已更改`);
+      setFollowLoading(true);
 
-      // 模拟API成功响应，重新获取用户信息以更新关注状态
+      if (isFollowing) {
+        // 取消关注
+        const success = await unfollowUser(currentUserId, userInfo.id);
+        if (success) {
+          setIsFollowing(false);
+          console.log(`${userInfo.id} 关注状态已更改: 已取消关注`);
+        }
+      } else {
+        // 关注
+        const success = await followUser(currentUserId, userInfo.id);
+        if (success) {
+          setIsFollowing(true);
+          console.log(`${userInfo.id} 关注状态已更改: 已关注`);
+        }
+      }
+
+      // 重新获取用户信息以确保UI状态和服务器状态一致
       const updatedUserInfo = await getUserInfo(userInfo.id);
       setUserInfo(updatedUserInfo);
     } catch (error) {
       console.error('更改关注状态失败', error);
+    } finally {
+      setFollowLoading(false);
     }
   };
 
@@ -163,25 +201,26 @@ const Detail = () => {
         {/* 作者信息和分享按钮 */}
         <View className="px-4 pt-3 flex-row items-center justify-between">
           {/* 返回按钮 */}
-        <View className="flex-row items-center">
-        <TouchableOpacity
-            onPress={() => {
-              router.back();
-            }}
-            className="px-2 py-3 flex-row items-center">
-            <Ionicons
-              name="chevron-back"
-              size={24}
-              color="#ff4d67"
-              className="mr-2"
-            />
-          </TouchableOpacity>
-          <PostAuthorHeader
+          <View className="flex-row items-center">
+            <TouchableOpacity
+              onPress={() => {
+                router.back();
+              }}
+              className="px-2 py-3 flex-row items-center">
+              <Ionicons
+                name="chevron-back"
+                size={24}
+                color="#ff4d67"
+                className="mr-2"
+              />
+            </TouchableOpacity>
+            <PostAuthorHeader
               userInfo={userInfo}
               currentUserId={currentUserId}
               onFollowPress={handleFollowPress}
+              isFollowing={isFollowing}
             />
-        </View>
+          </View>
           <View className="flex-row items-center">
             <TouchableOpacity onPress={handleShare}>
               <Ionicons name="share-outline" size={24} color="grey" />

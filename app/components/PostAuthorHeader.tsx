@@ -1,33 +1,57 @@
 import React, { useEffect, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { UserInfo } from '../../services/userService';
+import { UserInfo, followUser, unfollowUser } from '../../services/userService';
 
 interface PostAuthorHeaderProps {
   userInfo: UserInfo | null;
   currentUserId?: string; // 当前登录用户ID
   onFollowPress?: () => void;
+  isFollowing?: boolean; // 由父组件传递的关注状态
 }
 
 const PostAuthorHeader = ({
   userInfo,
   currentUserId = 'user1', // 默认用户ID，实际应从认证状态获取
   onFollowPress,
+  isFollowing: externalIsFollowing, // 从外部传入的状态
 }: PostAuthorHeaderProps) => {
   const [isFollowing, setIsFollowing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // 检查当前用户是否已关注作者
+  // 如果父组件传递了关注状态，则使用父组件的状态
   useEffect(() => {
-    if (userInfo && currentUserId) {
+    if (externalIsFollowing !== undefined) {
+      setIsFollowing(externalIsFollowing);
+    } else if (userInfo && currentUserId) {
+      // 否则使用本地计算的状态
       const isAlreadyFollowing =
         userInfo['user_info']?.fans?.includes(currentUserId);
       setIsFollowing(!!isAlreadyFollowing);
     }
-  }, [userInfo, currentUserId]);
+  }, [userInfo, currentUserId, externalIsFollowing]);
 
-  const handleFollowPress = () => {
-    setIsFollowing(!isFollowing);
-    if (onFollowPress) {
-      onFollowPress();
+  const handleFollowPress = async () => {
+    if (!userInfo || !userInfo.id || loading) return;
+
+    try {
+      setLoading(true);
+      if (isFollowing) {
+        // 取消关注
+        await unfollowUser(currentUserId, userInfo.id);
+        setIsFollowing(false);
+      } else {
+        // 关注
+        await followUser(currentUserId, userInfo.id);
+        setIsFollowing(true);
+      }
+
+      if (onFollowPress) {
+        onFollowPress();
+      }
+    } catch (error) {
+      console.error('关注/取消关注操作失败:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,12 +73,13 @@ const PostAuthorHeader = ({
       </Text>
       <TouchableOpacity
         onPress={handleFollowPress}
+        disabled={loading}
         className={`ml-5 px-3 py-1 rounded-full ${
           isFollowing ? 'bg-gray-200' : 'bg-[#FF4D67]'
         }`}>
         <Text
           className={`text-xs ${isFollowing ? 'text-gray-600' : 'text-white'}`}>
-          {isFollowing ? '已关注' : '关注'}
+          {loading ? '加载中...' : isFollowing ? '已关注' : '关注'}
         </Text>
       </TouchableOpacity>
     </View>
