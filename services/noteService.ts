@@ -48,13 +48,13 @@ export const getUserNotes = async (userId: string): Promise<NoteDetail[]> => {
 export const addComment = async (
   noteId: string,
   userId: string,
-  content: string
+  comment: string
 ): Promise<Comment> => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/comments`, {
+    const response = await axios.post(`${BASE_URL}/api/comment`, {
       noteId,
       userId,
-      content,
+      comment,
     });
     return response.data;
   } catch (error) {

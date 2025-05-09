@@ -163,7 +163,8 @@ const Detail = () => {
         {/* 作者信息和分享按钮 */}
         <View className="px-4 pt-3 flex-row items-center justify-between">
           {/* 返回按钮 */}
-          <TouchableOpacity
+        <View className="flex-row items-center">
+        <TouchableOpacity
             onPress={() => {
               router.back();
             }}
@@ -174,12 +175,13 @@ const Detail = () => {
               color="#ff4d67"
               className="mr-2"
             />
-            <PostAuthorHeader
+          </TouchableOpacity>
+          <PostAuthorHeader
               userInfo={userInfo}
               currentUserId={currentUserId}
               onFollowPress={handleFollowPress}
             />
-          </TouchableOpacity>
+        </View>
           <View className="flex-row items-center">
             <TouchableOpacity onPress={handleShare}>
               <Ionicons name="share-outline" size={24} color="grey" />
