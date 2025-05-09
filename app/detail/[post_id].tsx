@@ -1,6 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Stack, router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -8,14 +8,14 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { Comment, NoteDetail, getNoteDetail } from '../../services/noteService';
-import { UserInfo, getUserInfo } from '../../services/userService';
-import PostAuthorHeader from '../components/PostAuthorHeader';
-import PostComments from '../components/PostComments';
-import PostContent from '../components/PostContent';
-import PostHeader from '../components/PostHeader';
-import PostMediaCarousel from '../components/PostMediaCarousel';
+} from "react-native";
+import { Comment, NoteDetail, getNoteDetail } from "../../services/noteService";
+import { UserInfo, getUserInfo } from "../../services/userService";
+import PostAuthorHeader from "../components/PostAuthorHeader";
+import PostComments from "../components/PostComments";
+import PostContent from "../components/PostContent";
+import PostHeader from "../components/PostHeader";
+import PostMediaCarousel from "../components/PostMediaCarousel";
 
 const Detail = () => {
   const { post_id } = useLocalSearchParams();
@@ -26,7 +26,7 @@ const Detail = () => {
     {}
   );
   // 模拟当前登录用户ID，实际应从认证状态获取
-  const currentUserId = 'user1';
+  const currentUserId = "user1";
 
   // 获取游记详情
   useEffect(() => {
@@ -44,14 +44,14 @@ const Detail = () => {
             const authorInfo = await getUserInfo(noteData.user_id);
             setUserInfo(authorInfo);
           } catch (error) {
-            console.error('获取作者信息失败', error);
+            console.error("获取作者信息失败", error);
           }
         }
 
         // 获取评论用户信息
         if (noteData.comments && noteData.comments.length > 0) {
           const commentUserIds = [
-            ...new Set(noteData.comments.map((comment) => comment['user-id'])),
+            ...new Set(noteData.comments.map((comment) => comment["user-id"])),
           ];
 
           try {
@@ -67,13 +67,13 @@ const Detail = () => {
 
             setCommentUsers(userInfoMap);
           } catch (error) {
-            console.error('获取评论用户信息失败', error);
+            console.error("获取评论用户信息失败", error);
           }
         }
 
         setLoading(false);
       } catch (error) {
-        console.error('获取游记详情失败', error);
+        console.error("获取游记详情失败", error);
         setLoading(false);
       }
     };
@@ -91,7 +91,7 @@ const Detail = () => {
         title: post.title,
       });
     } catch (error) {
-      console.error('分享失败', error);
+      console.error("分享失败", error);
     }
   };
 
@@ -106,7 +106,7 @@ const Detail = () => {
       const updatedUserInfo = await getUserInfo(userInfo.id);
       setUserInfo(updatedUserInfo);
     } catch (error) {
-      console.error('更改关注状态失败', error);
+      console.error("更改关注状态失败", error);
     }
   };
 
@@ -120,16 +120,16 @@ const Detail = () => {
     });
 
     // 如果没有此用户的信息，需要获取
-    if (!commentUsers[newComment['user-id']]) {
-      getUserInfo(newComment['user-id'])
+    if (!commentUsers[newComment["user-id"]]) {
+      getUserInfo(newComment["user-id"])
         .then((userInfo) => {
           setCommentUsers({
             ...commentUsers,
-            [newComment['user-id']]: userInfo,
+            [newComment["user-id"]]: userInfo,
           });
         })
         .catch((error) => {
-          console.error('获取评论用户信息失败', error);
+          console.error("获取评论用户信息失败", error);
         });
     }
   };
@@ -155,6 +155,7 @@ const Detail = () => {
     <>
       <Stack.Screen
         options={{
+          headerTitle: post?.title,
           headerShown: false,
         }}
       />
@@ -167,7 +168,8 @@ const Detail = () => {
             onPress={() => {
               router.back();
             }}
-            className="px-2 py-3 flex-row items-center">
+            className="px-2 py-3 flex-row items-center"
+          >
             <Ionicons
               name="chevron-back"
               size={24}

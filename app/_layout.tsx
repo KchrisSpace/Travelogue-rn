@@ -5,7 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { AppRegistry } from "react-native";
 import "react-native-reanimated";
-import '../global.css';
+import "../global.css";
 import { AuthProvider } from "../hooks/useAuth";
 import { AuthGuard } from "./components/AuthGuard";
 // 创建一个 QueryClient 实例
@@ -21,57 +21,59 @@ export default function RootLayout() {
   }
 
   return (
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider
-         >
-      <AuthGuard>
-            <Stack>
-              <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-              headerTransparent: true,
-            }}
-          />
-              <Stack.Screen name="detail/post_detail" options={{ headerShown: false, headerTransparent: true }} />
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AuthGuard>
+          <Stack>
             <Stack.Screen
-            name="auth/index"
-            options={{
-              headerShown: false,
-              headerTransparent: true,
-            }}
-          />
-          <Stack.Screen
-            name="auth/login"
-            options={{
-              headerShown: true,
-              headerTitle: "",
-              headerTransparent: true,
-            }}
-          />
-          <Stack.Screen
-            name="auth/register"
-            options={{
-              headerShown: true,
-              headerTitle: "",
-              headerTransparent: true,
-            }}
-          />
+              name="(tabs)"
+              options={{
+                headerShown: false,
+                headerTransparent: true,
+              }}
+            />
+            <Stack.Screen
+              name="detail/[post_id]"
+              options={{ headerShown: false, headerTransparent: true }}
+            />
+            <Stack.Screen
+              name="auth/index"
+              options={{
+                headerShown: false,
+                headerTransparent: true,
+              }}
+            />
+            <Stack.Screen
+              name="auth/login"
+              options={{
+                headerShown: true,
+                headerTitle: "",
+                headerTransparent: true,
+              }}
+            />
+            <Stack.Screen
+              name="auth/register"
+              options={{
+                headerShown: true,
+                headerTitle: "",
+                headerTransparent: true,
+              }}
+            />
 
-          <Stack.Screen
-            name="publish"
-            options={{
-              headerShown: true,
-              title: "发布游记",
-              headerTransparent: true,
-            }}
-          />
-            </Stack>
-      </AuthGuard>
-          <StatusBar style="auto" />
-        </AuthProvider>
-      </QueryClientProvider>
+            <Stack.Screen
+              name="publish"
+              options={{
+                headerShown: true,
+                title: "发布游记",
+                headerTransparent: true,
+              }}
+            />
+          </Stack>
+        </AuthGuard>
+        <StatusBar style="auto" />
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
-AppRegistry.registerComponent('YourAppName', () => RootLayout);
+AppRegistry.registerComponent("YourAppName", () => RootLayout);

@@ -95,6 +95,9 @@ const server = http.createServer((req, res) => {
       const page = parseInt(query.page) || 1;
       const limit = parseInt(query.limit) || 5;
       result = paginateByPage(filteredNotes, page, limit);
+    } else {
+      // 没有分页参数时，直接返回全部游记数组
+      result = filteredNotes;
     }
 
     res.writeHead(200, { "Content-Type": "application/json" });

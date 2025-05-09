@@ -35,14 +35,12 @@ export const getNoteDetail = async (noteId: string): Promise<NoteDetail> => {
 // 获取指定用户的所有游记
 export const getUserNotes = async (userId: string): Promise<NoteDetail[]> => {
   try {
-    // 先获取全部游记
-    const response = await axios.get(`${BASE_URL}/api/notes?user_id=${userId}`);
+    const response = await axios.get(`${BASE_URL}/api/notes`);
     const allNotes = response.data;
-    // 前端筛选user_id
+    console.log("allNotes", allNotes);
     const userNotes = Array.isArray(allNotes)
       ? allNotes.filter((note) => note.user_id === userId)
       : [];
-    console.log('userNotes', userNotes);
     return userNotes;
   } catch (error) {
     console.error("获取用户游记列表失败", error);

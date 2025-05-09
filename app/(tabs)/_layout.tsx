@@ -30,17 +30,11 @@ export default function TabLayout() {
   useEffect(() => {
     if (isLoading) return;
     const inAuthGroup = segments[0] === "auth";
-    const inProtectedRoute = ["publish", "profile"].includes(segments[0]);
+    const inProtectedRoute = ["publish"].includes(segments[0]);
     if (!isAuthenticated && inProtectedRoute && !inAuthGroup) {
       router.replace("/auth");
     }
   }, [isAuthenticated, segments, isLoading]);
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/auth?redirect=/publish");
-    }
-  }, [isAuthenticated, isLoading]);
 
   return (
     <Tabs>

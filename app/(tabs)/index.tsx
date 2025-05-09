@@ -15,6 +15,7 @@ export default function HomeScreen() {
       <Stack.Screen
         options={{
           headerShown: false,
+        
         }}
       />
       <SafeAreaView>

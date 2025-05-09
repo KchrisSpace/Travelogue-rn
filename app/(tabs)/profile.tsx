@@ -22,7 +22,7 @@ import {
 } from "../../services/userService";
 
 export default function PersonalCenter() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const [travelogues, setTravelogues] = useState<NoteDetail[]>([]);
   const [followings, setFollowings] = useState<UserInfo[]>([]);
@@ -81,15 +81,7 @@ export default function PersonalCenter() {
         <Ionicons name="settings-outline" size={24} color="#ffffff1" />
       </TouchableOpacity>
       {/* 头像悬浮 */}
-      <View>
-        <Image
-          source={
-            user && (user as any)["user-info"]?.avatar
-              ? { uri: (user as any)["user-info"].avatar }
-              : require("../../assets/images/avatar/image.png")
-          }
-         />
-      </View>
+      
       <ScrollView>
         {/* 个人信息 */}
         <View style={styles.profileInfoWrap}>
@@ -97,8 +89,8 @@ export default function PersonalCenter() {
             <View style={styles.avatarWrap}>
               <Image
                 source={
-                  user && (user as any)["user-info"]?.avatar
-                    ? { uri: (user as any)["user-info"].avatar }
+                  isAuthenticated && user && user["user-info"]?.avatar
+                    ? { uri: user["user-info"].avatar }
                     : require("../../assets/images/avatar/image.png")
                 }
                 style={styles.avatar}
@@ -106,7 +98,9 @@ export default function PersonalCenter() {
             </View>
             <View style={styles.infoCol}>
               <Text style={styles.nickname}>
-                {(user && (user as any)["user-info"]?.nickname) || "未设置昵称"}
+                {isAuthenticated && user && user["user-info"]?.nickname
+                  ? user["user-info"].nickname
+                  : "未登录"}
               </Text>
               <Text style={styles.userid}>{user?.id ? `@${user.id}` : ""}</Text>
               {user && (user as any)["user-info"]?.signature ? (
@@ -181,23 +175,23 @@ const styles = StyleSheet.create({
   },
   settingsButton: {
     position: "absolute",
-    top: 16,
-    right: 16,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    top: 10,
+    right: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.129)",
     borderRadius: 20,
     padding: 8,
     zIndex: 999,
   },
   profileInfoWrap: {
-    backgroundColor: "#e2e7f0",
+    backgroundColor: "#ffffff",
     borderRadius: 20,
     marginHorizontal: 16,
-    // marginTop: -40,
+    marginTop: 60,
     padding: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
     elevation: 3,
   },
   profileRow: {
@@ -234,7 +228,7 @@ const styles = StyleSheet.create({
   signature: {
     fontSize: 14,
     color: "#38a3e0",
-     marginBottom: 2,
+    marginBottom: 2,
   },
   statsRow: {
     flexDirection: "row",
