@@ -8,14 +8,14 @@ export interface UserInfo {
   name: string;
   password: string;
   "user-info": {
-    avatar: string;
-    nickname: string;
-    gender: string;
-    birthday: string;
-    city: string;
-    signature: string;
-    follow: string[];
-    fans: string[];
+    avatar?: string;
+    nickname?: string;
+    gender?: string;
+    birthday?: string;
+    city?: string;
+    signature?: string;
+    follow?: string[];
+    fans?: string[];
   };
   favorite?: string[];
 }
@@ -35,7 +35,7 @@ export const getUserInfo = async (userId: string): Promise<UserInfo> => {
 export const getUserFollows = async (userId: string): Promise<UserInfo[]> => {
   try {
     const userInfo = await getUserInfo(userId);
-    const followIds = userInfo["user-info"].follow;
+    const followIds = userInfo["user-info"].follow || [];
 
     // 如果需要获取关注用户的详细信息，可以使用Promise.all批量请求
     const followUsers = await Promise.all(
@@ -53,7 +53,7 @@ export const getUserFollows = async (userId: string): Promise<UserInfo[]> => {
 export const getUserFans = async (userId: string): Promise<UserInfo[]> => {
   try {
     const userInfo = await getUserInfo(userId);
-    const fansIds = userInfo["user-info"].fans;
+    const fansIds = userInfo["user-info"].fans || [];
 
     // 如果需要获取粉丝用户的详细信息，可以使用Promise.all批量请求
     const fansUsers = await Promise.all(fansIds.map((id) => getUserInfo(id)));
@@ -126,6 +126,23 @@ export const getUserFavorites = async (
   }
 };
 
+// 更新用户信息
+export const updateUserInfo = async (
+  userId: string,
+  data: Partial<UserInfo>
+): Promise<UserInfo> => {
+  try {
+    const response = await axios.put(`${BASE_URL}/api/user`, {
+      id: userId,
+      ...data,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("更新用户信息失败", error);
+    throw error;
+  }
+};
+
 export default {
   getUserInfo,
   getUserFollows,
@@ -133,4 +150,5 @@ export default {
   followUser,
   unfollowUser,
   getUserFavorites,
+  updateUserInfo,
 };

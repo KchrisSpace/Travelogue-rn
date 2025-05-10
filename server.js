@@ -80,6 +80,13 @@ const server = http.createServer((req, res) => {
 
   setCorsHeaders(res);
 
+  // 处理 CORS 预检请求
+  if (req.method === "OPTIONS") {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+
   if (pathname === "/api/notes") {
     let filteredNotes = filterNotesByStatus(notes, query.status);
 
@@ -102,7 +109,7 @@ const server = http.createServer((req, res) => {
 
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(result));
-  } else if (pathname === "/api/user") {
+  } else if (pathname === "/api/user" && req.method === "GET") {
     // 根据用户ID查找用户
     const userId = query.id;
     if (!userId) {
@@ -119,6 +126,51 @@ const server = http.createServer((req, res) => {
       res.writeHead(404, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "用户未找到" }));
     }
+  } else if (pathname === "/api/user" && req.method === "PUT") {
+    // 更新用户信息
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk;
+    });
+    req.on("end", () => {
+      try {
+        const updateData = JSON.parse(body);
+        const { id, ...rest } = updateData;
+        if (!id) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "缺少用户ID参数" }));
+          return;
+        }
+        // 重新读取数据，防止并发问题
+        const data = JSON.parse(fs.readFileSync(dataFilePath, "utf-8"));
+        const users = data.user;
+        const userObj = users.find((u) => u.id === id);
+        if (!userObj) {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "用户未找到" }));
+          return;
+        }
+        // 只更新允许的字段
+        if (rest["user-info"]) {
+          userObj["user-info"] = {
+            ...userObj["user-info"],
+            ...rest["user-info"],
+          };
+        }
+        if (rest.avatar) userObj["user-info"].avatar = rest.avatar;
+        if (rest.nickname) userObj["user-info"].nickname = rest.nickname;
+        if (rest.signature) userObj["user-info"].signature = rest.signature;
+        // 可扩展更多字段
+
+        fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2), "utf-8");
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(userObj));
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "服务器错误", detail: err.message }));
+      }
+    });
   } else {
     res.writeHead(404, { "Content-Type": "text/plain" });
     res.end("Not Found");

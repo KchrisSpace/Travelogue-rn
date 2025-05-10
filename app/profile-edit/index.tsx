@@ -13,7 +13,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { updateUserInfo } from "../../services/userService";
 
 export default function EditProfile() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, refreshUser } = useAuth();
   const router = useRouter();
 
   // 只允许编辑这三项
@@ -27,14 +27,17 @@ export default function EditProfile() {
     if (!user) return;
     try {
       await updateUserInfo(user.id, {
-        avatar,
-        nickname,
-        signature,
+        "user-info": {
+          avatar,
+          nickname,
+          signature,
+        },
       });
+      await refreshUser();
       Alert.alert("保存成功");
       router.back();
-    } catch (e) {
-      Alert.alert("保存失败", e.message || "请重试");
+    } catch (e: any) {
+      Alert.alert("保存失败", e?.message || "请重试");
     }
   };
 

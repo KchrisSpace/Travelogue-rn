@@ -27,6 +27,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   isLoading: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -127,9 +128,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshUser = async () => {
+    if (!user?.id) return;
+    try {
+      const latest = await getUserInfo(user.id);
+      setUser(latest);
+      await AsyncStorage.setItem("user", JSON.stringify(latest));
+    } catch (error) {
+      // 可以选择清空用户或提示
+      console.error("刷新用户信息失败", error);
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, isAuthenticated, isLoading }}
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        isAuthenticated,
+        isLoading,
+        refreshUser,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -6,13 +6,19 @@
       "password": "123456",
       "user-info": {
         "avatar": "https://picsum.photos/360/460?random=333",
-        "nickname": "张三",
+        "nickname": "张adddd",
         "gender": "男",
         "birthday": "1990-01-01",
         "city": "北京",
         "signature": "热爱生活，热爱旅行",
-        "follow": ["user2", "user3"],
-        "fans": ["user4", "user5"]
+        "follow": [
+          "user2",
+          "user3"
+        ],
+        "fans": [
+          "user4",
+          "user5"
+        ]
       }
     },
     {
@@ -26,10 +32,20 @@
         "birthday": "1990-01-01",
         "city": "北京",
         "signature": "热爱生活，热爱旅行",
-        "follow": ["user1", "user3"],
-        "fans": ["user4", "user5"]
+        "follow": [
+          "user1",
+          "user3"
+        ],
+        "fans": [
+          "user4",
+          "user5"
+        ]
       },
-      "favorite": ["post1", "post2", "post3"]
+      "favorite": [
+        "post1",
+        "post2",
+        "post3"
+      ]
     },
     {
       "id": "user3",
@@ -42,10 +58,20 @@
         "birthday": "1990-01-01",
         "city": "北京",
         "signature": "热爱生活，热爱旅行",
-        "follow": ["user1", "user2"],
-        "fans": ["user4", "user5"]
+        "follow": [
+          "user1",
+          "user2"
+        ],
+        "fans": [
+          "user4",
+          "user5"
+        ]
       },
-      "favorite": ["post4", "post5", "post6"]
+      "favorite": [
+        "post4",
+        "post5",
+        "post6"
+      ]
     },
     {
       "id": "user4",

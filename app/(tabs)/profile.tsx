@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -30,35 +30,34 @@ export default function PersonalCenter() {
   const [favorites, setFavorites] = useState<NoteDetail[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-  useEffect(() => {
-    if (!user?.id) return;
-    // 获取用户详细信息、游记、关注、粉丝、收藏
-    const fetchData = async () => {
-      try {
-        const [userInfoData, notes, follows, fans, favs] = await Promise.all([
-          getUserInfo(user.id),
-          getUserNotes(user.id),
-          getUserFollows(user.id),
-          getUserFans(user.id),
-          getUserFavorites(user.id),
-        ]);
-        console.log("notes:", notes); // 看看这里是不是数组
-        setUserInfo(userInfoData);
-        setTravelogues(Array.isArray(notes) ? notes : []);
-        setFollowings(Array.isArray(follows) ? follows : []);
-        setFollowers(Array.isArray(fans) ? fans : []);
-        setFavorites(Array.isArray(favs) ? favs : []);
-      } catch (e) {
-        // 可以做错误提示
-        setUserInfo(null);
-        setTravelogues([]);
-        setFollowings([]);
-        setFollowers([]);
-        setFavorites([]);
-      }
-    };
-    fetchData();
-  }, [user?.id]);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!user?.id) return;
+      const fetchData = async () => {
+        try {
+          const [userInfoData, notes, follows, fans, favs] = await Promise.all([
+            getUserInfo(user.id),
+            getUserNotes(user.id),
+            getUserFollows(user.id),
+            getUserFans(user.id),
+            getUserFavorites(user.id),
+          ]);
+          setUserInfo(userInfoData);
+          setTravelogues(Array.isArray(notes) ? notes : []);
+          setFollowings(Array.isArray(follows) ? follows : []);
+          setFollowers(Array.isArray(fans) ? fans : []);
+          setFavorites(Array.isArray(favs) ? favs : []);
+        } catch (e) {
+          setUserInfo(null);
+          setTravelogues([]);
+          setFollowings([]);
+          setFollowers([]);
+          setFavorites([]);
+        }
+      };
+      fetchData();
+    }, [user?.id])
+  );
 
   const handleSettingsPress = () => {
     // TODO: 实现设置页面跳转
