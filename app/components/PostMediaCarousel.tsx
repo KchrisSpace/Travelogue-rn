@@ -32,6 +32,7 @@ const PostMediaCarousel = ({ mediaList }: PostMediaCarouselProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [videoFullscreen, setVideoFullscreen] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const videoRef = useRef(null);
   const { width } = Dimensions.get('window');
 
@@ -72,7 +73,7 @@ const PostMediaCarousel = ({ mediaList }: PostMediaCarouselProps) => {
               resizeMode="contain"
               controls={true}
               repeat={true}
-              paused={false}
+              paused={!isVideoPlaying}
               onLoad={() => setIsVideoLoading(false)}
               onError={(error) => {
                 console.error('视频加载错误:', error);
@@ -121,6 +122,12 @@ const PostMediaCarousel = ({ mediaList }: PostMediaCarouselProps) => {
         }}
         onSnapToItem={(index) => {
           setCurrentImageIndex(index);
+          // 如果当前项不是视频，暂停视频播放
+          if (mediaList[index].type !== 'video') {
+            setIsVideoPlaying(false);
+          } else {
+            setIsVideoPlaying(true);
+          }
         }}
         renderItem={renderMediaItem}
       />

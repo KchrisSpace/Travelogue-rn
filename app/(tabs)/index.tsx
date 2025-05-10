@@ -38,8 +38,8 @@ export default function HomeScreen() {
               left: '37.8%',
             },
           }}>
-          <Tab.Screen name="发现" component={index_all} />
-          <Tab.Screen name="关注" component={index_follow} />
+          <Tab.Screen name="index_all" component={index_all} options={{ title: '发现' }}/>
+          <Tab.Screen name="index_follow" component={index_follow} options={{ title: '关注' }} />
         </Tab.Navigator>
         <Link href="/search" className="absolute top-3 right-3 z-10">
           <FontAwesome size={20} name="search" color="#c1c1c1" />
