@@ -21,24 +21,18 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AuthGuard>
-          <Stack>
-            <Stack.Screen
-              name="(tabs)"
-              options={{
-                headerShown: false,
-                headerTransparent: true,
-              }}
-            />
-            <Stack.Screen
-              name="detail/[post_id]"
-              options={{ headerShown: false, headerTransparent: true }}
-            />
-           
-         
-           
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider
+         >
+      <AuthGuard>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+            }}
+          />
+              <Stack.Screen name="detail/post_detail" options={{ headerShown: false }} />
             <Stack.Screen
               name="auth/index"
               options={{
@@ -63,19 +57,24 @@ export default function RootLayout() {
               }}
             />
 
-            <Stack.Screen
-              name="publish"
-              options={{
-                headerShown: true,
-                title: "发布游记",
-                headerTransparent: true,
-              }}
-            />
-          </Stack>
-        </AuthGuard>
-        <StatusBar style="auto" />
-      </AuthProvider>
-    </QueryClientProvider>
+          <Stack.Screen
+            name="publish"
+            options={{
+              headerShown: true,
+              title: "发布游记",
+            }}
+          />
+          <Stack.Screen
+            name="search"
+            options={{
+              headerShown: false,
+            }}
+          />
+            </Stack>
+      </AuthGuard>
+          <StatusBar style="auto" />
+        </AuthProvider>
+      </QueryClientProvider>
   );
 }
 

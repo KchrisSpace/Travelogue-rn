@@ -1,20 +1,20 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Tabs, useRouter, useSegments } from "expo-router";
-import { useEffect } from "react";
-import { TouchableOpacity } from "react-native";
-import { useAuth } from "../../hooks/useAuth";
+import { Ionicons } from '@expo/vector-icons';
+import { Tabs, useRouter, useSegments } from 'expo-router';
+import { useEffect } from 'react';
+import { TouchableOpacity } from 'react-native';
+import { useAuth } from '../../hooks/useAuth';
 
 function FilteredTouchableOpacity(props: any) {
   const { onPress, ...rest } = props;
   // 过滤掉 type/href 等属性
   const filteredProps = Object.fromEntries(
-    Object.entries(rest).filter(([key]) => !["type", "href"].includes(key))
+    Object.entries(rest).filter(([key]) => !['type', 'href'].includes(key))
   );
   return (
     <TouchableOpacity
       {...filteredProps}
       onPress={(e) => {
-        if (typeof e?.preventDefault === "function") e.preventDefault();
+        if (typeof e?.preventDefault === 'function') e.preventDefault();
         if (onPress) onPress(e);
       }}
     />
@@ -25,19 +25,25 @@ export default function TabLayout() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
-  console.log("isAuthenticated", isAuthenticated);
+  console.log('isAuthenticated', isAuthenticated);
 
   useEffect(() => {
     if (isLoading) return;
     const inAuthGroup = segments[0] === "auth";
     const inProtectedRoute = ["publish"].includes(segments[0]);
     if (!isAuthenticated && inProtectedRoute && !inAuthGroup) {
-      router.replace("/auth");
+      router.replace('/auth');
     }
   }, [isAuthenticated, segments, isLoading]);
 
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: '#FF4D67', // 选中时的颜色
+        tabBarInactiveTintColor: '#999999', // 未选中时的颜色
+        tabBarStyle: { backgroundColor: '#fff' }, // TabBar 背景色
+        headerShown: false,
+      }}>
       <Tabs.Screen
         name="index"
         options={{
@@ -82,31 +88,30 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index_all"
         options={{
-          title: "All",
+          title: 'All',
           tabBarItemStyle: {
-            display: "none",
+            display: 'none',
           },
         }}
       />
       <Tabs.Screen
         name="index_follow"
         options={{
-          title: "Follow",
+          title: 'Follow',
           tabBarItemStyle: {
-            display: "none",
+            display: 'none',
           },
         }}
       />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: "Search",
-          headerShown: false,
-          tabBarItemStyle: {
-            display: "none",
-          },
-        }}
-      />
+      {/* <Tabs.Screen
+      name="search"
+      options={{
+        title: "Search",
+        tabBarItemStyle: {
+        display: "none",
+        },
+      }}
+      /> */}
     </Tabs>
   );
 }

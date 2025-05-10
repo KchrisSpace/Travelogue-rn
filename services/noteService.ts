@@ -4,9 +4,9 @@ import { BASE_URL } from "../const";
 // 评论接口
 export interface Comment {
   id: string;
-  "user-id": string;
+  user_id: string;
   content: string;
-  createdAt: string;
+  created_at: string;
 }
 
 // 游记详情接口
@@ -16,8 +16,9 @@ export interface NoteDetail {
   title: string;
   content: string;
   image: string[];
+  video?: string; // 可选的视频URL
   status: string;
-  createdAt: string;
+  created_at: string;
   comments: Comment[];
 }
 
@@ -52,13 +53,13 @@ export const getUserNotes = async (userId: string): Promise<NoteDetail[]> => {
 export const addComment = async (
   noteId: string,
   userId: string,
-  content: string
+  comment: string
 ): Promise<Comment> => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/comments`, {
+    const response = await axios.post(`${BASE_URL}/api/comment`, {
       noteId,
       userId,
-      content,
+      comment,
     });
     return response.data;
   } catch (error) {

@@ -1,9 +1,11 @@
+import { Ionicons } from "@expo/vector-icons";
 import { MasonryFlashList } from "@shopify/flash-list";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
+import Video from "react-native-video";
 // import { DATA } from "./data";
 import { BASE_URL } from "../../const";
 import { UserInfo, getUserInfo } from "../../services/userService";
@@ -15,7 +17,8 @@ interface Note {
   image: string[];
   title: string;
   status: string;
-  createdAt: string;
+  created_at: string;
+  video?: string;
 }
 
 interface NotesResponse {
@@ -144,13 +147,13 @@ const Index_all = () => {
 
           // 获取用户信息
           const avatar =
-            item.userInfo?.["user-info"]?.avatar ||
+            item.userInfo?.["user_info"]?.avatar ||
             "https://via.placeholder.com/28";
-          const nickname = item.userInfo?.["user-info"]?.nickname || "momo";
+          const nickname = item.userInfo?.["user_info"]?.nickname || "momo";
 
           // 格式化日期
-          const createdDate = item.createdAt
-            ? new Date(item.createdAt).toLocaleDateString("zh-CN", {
+          const createdDate = item.created_at
+            ? new Date(item.created_at).toLocaleDateString("zh-CN", {
                 month: "2-digit",
                 day: "2-digit",
               })
@@ -167,21 +170,30 @@ const Index_all = () => {
                 })
               }
             >
-              <View
-                style={{
-                  borderTopLeftRadius: 8,
-                  borderTopRightRadius: 8,
-                  height: imageHeight,
-                }}
-              >
-                <Image
-                  source={{ uri: item?.image[0] }}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                  }}
-                  resizeMode="cover"
-                />
+              <View className="rounded-t-lg" style={{ height: imageHeight }}>
+                {item.video ? (
+                  <View className="w-full h-full bg-black">
+                    <Video
+                      source={{ uri: item.video }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                      }}
+                      resizeMode="cover"
+                      paused={true}
+                      controls={false}
+                    />
+                    <View className="absolute top-2 right-2 bg-black/50 rounded-full p-1">
+                      <Ionicons name="videocam" size={16} color="white" />
+                    </View>
+                  </View>
+                ) : (
+                  <Image
+                    source={{ uri: item.image[0] }}
+                    className="w-full h-full"
+                    resizeMode="cover"
+                  />
+                )}
               </View>
               <View className="mx-2 mt-2 mb-3">
                 <Text className="font-medium text-sm line-clamp-2">
