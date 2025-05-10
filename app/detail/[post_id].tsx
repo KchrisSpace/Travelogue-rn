@@ -23,6 +23,11 @@ import PostContent from '../components/PostContent';
 import PostHeader from '../components/PostHeader';
 import PostMediaCarousel from '../components/PostMediaCarousel';
 
+type MediaItem = {
+  type: 'image' | 'video';
+  url: string;
+};
+
 const Detail = () => {
   const { post_id } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
@@ -229,7 +234,23 @@ const Detail = () => {
         </View>
 
         {/* 媒体展示区域 */}
-        <PostMediaCarousel mediaList={post.image || []} />
+        <PostMediaCarousel
+          mediaList={
+            post.image
+              ? [
+                  // 如果有视频，将视频放在第一位
+                  ...(post.video
+                    ? [{ type: 'video' as const, url: post.video }]
+                    : []),
+                  // 添加所有图片
+                  ...post.image.map((url) => ({
+                    type: 'image' as const,
+                    url: url,
+                  })),
+                ]
+              : []
+          }
+        />
 
         {/* 标题 */}
         <PostHeader post={post} />

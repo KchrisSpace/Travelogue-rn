@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   Modal,
@@ -10,19 +11,28 @@ import {
 } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Carousel from 'react-native-reanimated-carousel';
+import Video from 'react-native-video';
+
+type MediaItem = {
+  type: 'image' | 'video';
+  url: string;
+};
 
 type CarouselRenderItemInfo = {
-  item: string;
+  item: MediaItem;
   index: number;
 };
 
 interface PostMediaCarouselProps {
-  mediaList: string[];
+  mediaList: MediaItem[];
 }
 
 const PostMediaCarousel = ({ mediaList }: PostMediaCarouselProps) => {
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [videoFullscreen, setVideoFullscreen] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
+  const videoRef = useRef(null);
   const { width } = Dimensions.get('window');
 
   // 固定轮播图高度
@@ -31,6 +41,72 @@ const PostMediaCarousel = ({ mediaList }: PostMediaCarouselProps) => {
   if (!mediaList || mediaList.length === 0) {
     return null;
   }
+
+  const renderMediaItem = ({ item, index }: CarouselRenderItemInfo) => {
+    if (item.type === 'video') {
+      return (
+        <TouchableOpacity
+          style={{
+            width: '100%',
+            height: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#000',
+          }}
+          onPress={() => setVideoFullscreen(true)}>
+          <View
+            style={{
+              width: '100%',
+              height: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            {isVideoLoading && <ActivityIndicator size="large" color="#fff" />}
+            <Video
+              ref={videoRef}
+              source={{ uri: item.url }}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              resizeMode="contain"
+              controls={true}
+              repeat={true}
+              paused={false}
+              onLoad={() => setIsVideoLoading(false)}
+              onError={(error) => {
+                console.error('视频加载错误:', error);
+                setIsVideoLoading(false);
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+      );
+    }
+
+    return (
+      <TouchableOpacity
+        style={{
+          width: '100%',
+          height: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        onPress={() => {
+          setCurrentImageIndex(index);
+          setImageViewerVisible(true);
+        }}>
+        <Image
+          source={{ uri: item.url }}
+          style={{
+            width: '100%',
+            height: '100%',
+            resizeMode: 'contain',
+          }}
+        />
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View className="relative" style={{ height: CAROUSEL_HEIGHT }}>
@@ -46,30 +122,7 @@ const PostMediaCarousel = ({ mediaList }: PostMediaCarouselProps) => {
         onSnapToItem={(index) => {
           setCurrentImageIndex(index);
         }}
-        renderItem={({ item, index }: CarouselRenderItemInfo) => {
-          return (
-            <TouchableOpacity
-              style={{
-                width: '100%',
-                height: '100%',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              onPress={() => {
-                setCurrentImageIndex(index);
-                setImageViewerVisible(true);
-              }}>
-              <Image
-                source={{ uri: item }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  resizeMode: 'contain',
-                }}
-              />
-            </TouchableOpacity>
-          );
-        }}
+        renderItem={renderMediaItem}
       />
 
       {/* 指示器 */}
@@ -87,7 +140,9 @@ const PostMediaCarousel = ({ mediaList }: PostMediaCarouselProps) => {
       {/* 图片查看器 */}
       <Modal visible={imageViewerVisible} transparent={true}>
         <ImageViewer
-          imageUrls={mediaList.map((url) => ({ url })) || []}
+          imageUrls={mediaList
+            .filter((item) => item.type === 'image')
+            .map((item) => ({ url: item.url }))}
           index={currentImageIndex}
           enableSwipeDown
           onSwipeDown={() => setImageViewerVisible(false)}
@@ -104,6 +159,43 @@ const PostMediaCarousel = ({ mediaList }: PostMediaCarouselProps) => {
             </View>
           )}
         />
+      </Modal>
+
+      {/* 视频全屏播放器 */}
+      <Modal visible={videoFullscreen} transparent={true}>
+        <View className="flex-1 bg-black justify-center items-center">
+          <TouchableOpacity
+            className="absolute top-10 left-4 p-1 bg-black/30 rounded-full z-50"
+            onPress={() => setVideoFullscreen(false)}>
+            <Ionicons name="close" size={24} color="white" />
+          </TouchableOpacity>
+          <View
+            style={{
+              width: '100%',
+              height: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            {isVideoLoading && <ActivityIndicator size="large" color="#fff" />}
+            <Video
+              ref={videoRef}
+              source={{ uri: mediaList[0].url }}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              resizeMode="contain"
+              controls={true}
+              repeat={true}
+              paused={false}
+              onLoad={() => setIsVideoLoading(false)}
+              onError={(error) => {
+                console.error('视频加载错误:', error);
+                setIsVideoLoading(false);
+              }}
+            />
+          </View>
+        </View>
       </Modal>
     </View>
   );

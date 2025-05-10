@@ -16,6 +16,7 @@ export interface NoteDetail {
   title: string;
   content: string;
   image: string[];
+  video?: string; // 可选的视频URL
   status: string;
   created_at: string;
   comments: Comment[];
