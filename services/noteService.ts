@@ -33,15 +33,29 @@ export const getNoteDetail = async (noteId: string): Promise<NoteDetail> => {
   }
 };
 
+// 发布游记
+export const publishNote = async (note: NoteDetail): Promise<NoteDetail> => {
+  try {
+    console.log("发布游记", note);
+    const response = await axios.post(`${BASE_URL}/api/notes`, note);
+    console.log("发布游记成功", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("发布游记失败", error);
+    throw error;
+  }
+};
+
 // 获取指定用户的所有游记
 export const getUserNotes = async (userId: string): Promise<NoteDetail[]> => {
   try {
     const response = await axios.get(`${BASE_URL}/api/notes`);
     const allNotes = response.data;
-    console.log("allNotes", allNotes);
+    console.log("Fetched all notes:", allNotes);
     const userNotes = Array.isArray(allNotes)
       ? allNotes.filter((note) => note.user_id === userId)
       : [];
+    console.log("Filtered user notes:", userNotes);
     return userNotes;
   } catch (error) {
     console.error("获取用户游记列表失败", error);

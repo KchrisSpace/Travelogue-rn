@@ -6,7 +6,7 @@ import { getUserInfo } from "../services/userService";
 interface User {
   id: string;
   password: string;
-  "user-info"?: {
+  user_info?: {
     avatar?: string;
     nickname?: string;
     gender?: string;

@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -32,9 +32,11 @@ export default function PersonalCenter() {
 
   useFocusEffect(
     React.useCallback(() => {
+      console.log("profile useFocusEffect 触发");
       if (!user?.id) return;
       const fetchData = async () => {
         try {
+          console.log("profile fetchData 请求 getUserInfo");
           const [userInfoData, notes, follows, fans, favs] = await Promise.all([
             getUserInfo(user.id),
             getUserNotes(user.id),
@@ -42,6 +44,7 @@ export default function PersonalCenter() {
             getUserFans(user.id),
             getUserFavorites(user.id),
           ]);
+          console.log("profile setUserInfo", userInfoData);
           setUserInfo(userInfoData);
           setTravelogues(Array.isArray(notes) ? notes : []);
           setFollowings(Array.isArray(follows) ? follows : []);
@@ -59,10 +62,21 @@ export default function PersonalCenter() {
     }, [user?.id])
   );
 
+  useEffect(() => {
+    if (!user) return;
+    // 获取所有游记后，筛选属于当前用户的游记
+    getUserNotes(user.id).then((allNotes) => {
+      const myNotes = allNotes.filter((note) => note.user_id === user.id);
+      setTravelogues(myNotes);
+    });
+  }, [user]);
+
   const handleSettingsPress = () => {
     // TODO: 实现设置页面跳转
     console.log("Settings pressed");
   };
+
+  console.log("profile 渲染 userInfo", userInfo);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fdfeff" }}>
@@ -88,8 +102,8 @@ export default function PersonalCenter() {
             <View style={styles.avatarWrap}>
               <Image
                 source={
-                  isAuthenticated && user && user["user-info"]?.avatar
-                    ? { uri: user["user-info"].avatar }
+                  userInfo && userInfo["user_info"]?.avatar
+                    ? { uri: userInfo["user_info"].avatar }
                     : require("../../assets/images/avatar/image.png")
                 }
                 style={styles.avatar}
@@ -97,14 +111,14 @@ export default function PersonalCenter() {
             </View>
             <View style={styles.infoCol}>
               <Text style={styles.nickname}>
-                {isAuthenticated && user && user["user-info"]?.nickname
-                  ? user["user-info"].nickname
+                {userInfo && userInfo["user_info"]?.nickname
+                  ? userInfo["user_info"].nickname
                   : "未登录"}
               </Text>
               <Text style={styles.userid}>{user?.id ? `@${user.id}` : ""}</Text>
-              {user && (user as any)["user-info"]?.signature ? (
+              {userInfo && userInfo["user_info"]?.signature ? (
                 <Text style={styles.signature}>
-                  {(user as any)["user-info"].signature}
+                  {userInfo["user_info"].signature}
                 </Text>
               ) : null}
             </View>
@@ -112,13 +126,13 @@ export default function PersonalCenter() {
           <View style={styles.statsRow}>
             <TouchableOpacity style={styles.statItem}>
               <Text style={styles.statNum}>
-                {userInfo?.["user-info"]?.follow?.length || 0}
+                {userInfo?.["user_info"]?.follow?.length || 0}
               </Text>
               <Text style={styles.statLabel}>关注</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.statItem}>
               <Text style={styles.statNum}>
-                {userInfo?.["user-info"]?.fans?.length || 0}
+                {userInfo?.["user_info"]?.fans?.length || 0}
               </Text>
               <Text style={styles.statLabel}>粉丝</Text>
             </TouchableOpacity>
@@ -147,7 +161,7 @@ export default function PersonalCenter() {
                 <View>
                   <Text style={styles.travelogueItemTitle}>{item.title}</Text>
                   <Text style={styles.travelogueItemDate}>
-                    {item.createdAt}
+                    {item.created_at.split("T")[0]}
                   </Text>
                 </View>
                 <TouchableOpacity style={styles.viewBtn}>

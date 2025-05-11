@@ -1,5 +1,5 @@
 import { Stack, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -16,26 +16,33 @@ export default function EditProfile() {
   const { user, isAuthenticated, refreshUser } = useAuth();
   const router = useRouter();
 
-  // 只允许编辑这三项
-  const [avatar, setAvatar] = useState(user?.["user-info"]?.avatar || "");
-  const [nickname, setNickname] = useState(user?.["user-info"]?.nickname || "");
-  const [signature, setSignature] = useState(
-    user?.["user-info"]?.signature || ""
-  );
+  const [avatar, setAvatar] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [signature, setSignature] = useState("");
+
+  useEffect(() => {
+    if (user && user.user_info) {
+      setAvatar(user.user_info.avatar || "");
+      setNickname(user.user_info.nickname || "");
+      setSignature(user.user_info.signature || "");
+    }
+  }, [user]);
+
+  if (!user || !user.user_info) {
+    return <Text>加载中...</Text>;
+  }
 
   const handleSave = async () => {
     if (!user) return;
     try {
-      await updateUserInfo(user.id, {
-        "user-info": {
-          avatar,
-          nickname,
-          signature,
-        },
-      });
+      const updateData: any = { user_info: { ...user.user_info } };
+      updateData.user_info.avatar = avatar;
+      updateData.user_info.nickname = nickname;
+      updateData.user_info.signature = signature;
+      await updateUserInfo(user.id, updateData);
       await refreshUser();
       Alert.alert("保存成功");
-      router.back();
+      router.back(); // Navigate back to the profile page
     } catch (e: any) {
       Alert.alert("保存失败", e?.message || "请重试");
     }
@@ -52,7 +59,7 @@ export default function EditProfile() {
       />
       <View style={styles.container}>
         <Text style={styles.label}>账号（不可更改）</Text>
-        <Text style={styles.value}>{user?.id}</Text>
+        <Text style={styles.value}>{user.id}</Text>
 
         <Text style={styles.label}>头像链接</Text>
         <TextInput
@@ -66,6 +73,7 @@ export default function EditProfile() {
         ) : null}
 
         <Text style={styles.label}>昵称</Text>
+        <Text>当前昵称：{user.user_info.nickname}</Text>
         <TextInput
           style={styles.input}
           value={nickname}

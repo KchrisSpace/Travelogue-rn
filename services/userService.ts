@@ -35,13 +35,11 @@ export const getUserInfo = async (userId: string): Promise<UserInfo> => {
 export const getUserFollows = async (userId: string): Promise<UserInfo[]> => {
   try {
     const userInfo = await getUserInfo(userId);
-    const followIds = userInfo['user_info'].follow;
-
-    // 如果需要获取关注用户的详细信息，可以使用Promise.all批量请求
+    const userInfoObj = userInfo.user_info || userInfo["user-info"] || {};
+    const followIds = userInfoObj.follow || [];
     const followUsers = await Promise.all(
       followIds.map((id) => getUserInfo(id))
     );
-
     return followUsers;
   } catch (error) {
     console.error("获取用户关注列表失败", error);
@@ -53,11 +51,9 @@ export const getUserFollows = async (userId: string): Promise<UserInfo[]> => {
 export const getUserFans = async (userId: string): Promise<UserInfo[]> => {
   try {
     const userInfo = await getUserInfo(userId);
-    const fansIds = userInfo['user_info'].fans;
-
-    // 如果需要获取粉丝用户的详细信息，可以使用Promise.all批量请求
+    const userInfoObj = userInfo.user_info || {};
+    const fansIds = userInfoObj.fans || [];
     const fansUsers = await Promise.all(fansIds.map((id) => getUserInfo(id)));
-
     return fansUsers;
   } catch (error) {
     console.error("获取用户粉丝列表失败", error);
@@ -75,10 +71,10 @@ export const followUser = async (
       userId,
       followId,
     });
-    console.log('关注成功:', response.data.message || '关注成功');
+    console.log("关注成功:", response.data.message || "关注成功");
     return response.data.success || true;
   } catch (error: any) {
-    console.error('关注失败:', error.response?.data?.error || error.message);
+    console.error("关注失败:", error.response?.data?.error || error.message);
 
     // 暂时模拟成功，实际项目中应该抛出错误
     console.log("模拟关注成功");
@@ -95,11 +91,11 @@ export const unfollowUser = async (
     const response = await axios.delete(`${BASE_URL}/api/follow`, {
       data: { userId, followId },
     });
-    console.log('取消关注成功:', response.data.message);
+    console.log("取消关注成功:", response.data.message);
     return true;
   } catch (error: any) {
     console.error(
-      '取消关注失败:',
+      "取消关注失败:",
       error.response?.data?.error || error.message
     );
     return false;
@@ -118,11 +114,49 @@ export const checkIfFollowing = async (
         followId,
       },
     });
-    console.log(response.data.isFollowing ? '已关注' : '未关注');
+    console.log(response.data.isFollowing ? "已关注" : "未关注");
     return response.data.isFollowing;
   } catch (error: any) {
-    console.error('查询关注状态失败:', error.response?.data || error.message);
+    console.error("查询关注状态失败:", error.response?.data || error.message);
     return false;
+  }
+};
+
+// 获取用户收藏的游记
+export const getUserFavorites = async (
+  userId: string
+): Promise<NoteDetail[]> => {
+  try {
+    // 先获取用户信息，拿到favorite数组
+    const userInfo = await getUserInfo(userId);
+    const favoriteIds = userInfo.favorite || [];
+    if (favoriteIds.length === 0) return [];
+    // 批量获取游记详情
+    const { getNoteDetail } = await import("./noteService");
+    const favoriteNotes = await Promise.all(
+      favoriteIds.map((id) => getNoteDetail(id))
+    );
+    return favoriteNotes;
+  } catch (error) {
+    console.error("获取用户收藏失败", error);
+    throw error;
+  }
+};
+
+// 更新用户信息
+export const updateUserInfo = async (
+  userId: string,
+  data: Partial<UserInfo>
+): Promise<UserInfo> => {
+  try {
+    const response = await axios.put(`${BASE_URL}/api/user`, {
+      id: userId,
+      ...data,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("更新用户信息失败", error);
+    throw error;
   }
 };
 

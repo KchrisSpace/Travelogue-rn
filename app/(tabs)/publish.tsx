@@ -14,6 +14,7 @@ import {
 import { ThemedText } from "../../components/ThemedText";
 import { useAuth } from "../../hooks/useAuth";
 import { useThemeColor } from "../../hooks/useThemeColor";
+import { publishNote } from "../../services/noteService";
 
 const categories = [
   { label: "机遇", value: 1 },
@@ -55,26 +56,45 @@ export default function PublishScreen() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!user) {
       alert("请先登录");
       router.replace("/auth?redirect=/publish");
       return;
     }
-    // 只做本地打印，不请求任何接口
-    console.log({
-      userId: user.id,
-      image,
+
+    const postData = {
+      id: `post_${Date.now()}`, // Generate a unique ID
+      user_id: user.id,
       title,
-      location,
-      selectedCategories,
       content,
-    });
-    alert("发布成功！（仅本地模拟）");
+      image: image ? [image] : [],
+      video: "", // Default empty video
+      location,
+      status: "pending", // Set initial status
+      created_at: new Date().toISOString(),
+      comments: [], // Default empty comments
+    };
+
+    try {
+      const response = await publishNote(postData);
+      if (response) {
+        alert("发布成功！");
+        router.replace("/(tabs)"); // Navigate to the main page or another page
+      } else {
+        alert("发布失败，请重试。");
+      }
+    } catch (error) {
+      console.error("发布失败:", error);
+      alert("发布失败，请重试。");
+    }
   };
 
   return (
     <ScrollView style={[styles.container, { backgroundColor }]}>
+      <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
+        发布游记
+      </Text>
       <View style={styles.form}>
         <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
           {image ? (
@@ -106,35 +126,7 @@ export default function PublishScreen() {
             placeholder="请输入位置"
           />
         </View>
-        <View style={styles.inputGroup}>
-          <ThemedText>分类</ThemedText>
-          <View style={styles.categoryRow}>
-            {categories.map((cat) => (
-              <TouchableOpacity
-                key={cat.value}
-                style={[
-                  styles.categoryTag,
-                  selectedCategories.includes(cat.value) &&
-                    styles.categoryTagActive,
-                ]}
-                onPress={() => handleCategoryChange(cat.value)}
-              >
-                <Text
-                  style={{
-                    color: selectedCategories.includes(cat.value)
-                      ? "#22c55e"
-                      : "#666",
-                    fontWeight: selectedCategories.includes(cat.value)
-                      ? "bold"
-                      : "normal",
-                  }}
-                >
-                  {cat.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+
         <View style={styles.inputGroup}>
           <ThemedText>正文</ThemedText>
           <TextInput
@@ -155,9 +147,18 @@ export default function PublishScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
+    backgroundColor: "#f9fafb",
   },
   form: {
-    padding: 16,
+    // padding: 16,
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 8,
+    // elevation: 3,
   },
   inputGroup: {
     marginVertical: 12,
@@ -168,6 +169,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginTop: 8,
+    backgroundColor: "#f3f4f6",
   },
   textArea: {
     height: 120,
@@ -211,5 +213,17 @@ const styles = StyleSheet.create({
   },
   categoryTagActive: {
     borderColor: "#22c55e",
+  },
+  button: {
+    backgroundColor: "#22c55e",
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
