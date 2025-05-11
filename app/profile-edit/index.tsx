@@ -73,8 +73,7 @@ export default function EditProfile() {
         ) : null}
 
         <Text style={styles.label}>昵称</Text>
-        <Text>当前昵称：{user.user_info.nickname}</Text>
-        <TextInput
+         <TextInput
           style={styles.input}
           value={nickname}
           onChangeText={setNickname}

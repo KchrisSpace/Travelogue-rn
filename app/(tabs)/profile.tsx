@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -21,6 +21,11 @@ import {
   getUserInfo,
 } from "../../services/userService";
 
+// 用户信息接口类型扩展，允许 notes 字段
+export interface UserInfoWithNotes extends UserInfo {
+  notes?: NoteDetail[];
+}
+
 export default function PersonalCenter() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -28,7 +33,7 @@ export default function PersonalCenter() {
   const [followings, setFollowings] = useState<UserInfo[]>([]);
   const [followers, setFollowers] = useState<UserInfo[]>([]);
   const [favorites, setFavorites] = useState<NoteDetail[]>([]);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInfoWithNotes | null>(null);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -61,15 +66,6 @@ export default function PersonalCenter() {
       fetchData();
     }, [user?.id])
   );
-
-  useEffect(() => {
-    if (!user) return;
-    // 获取所有游记后，筛选属于当前用户的游记
-    getUserNotes(user.id).then((allNotes) => {
-      const myNotes = allNotes.filter((note) => note.user_id === user.id);
-      setTravelogues(myNotes);
-    });
-  }, [user]);
 
   const handleSettingsPress = () => {
     // TODO: 实现设置页面跳转
@@ -155,11 +151,17 @@ export default function PersonalCenter() {
         {/* 我的游记 */}
         <View style={styles.travelogueSection}>
           <Text style={styles.travelogueTitle}>我的游记</Text>
-          {Array.isArray(travelogues) && travelogues.length > 0 ? (
-            travelogues.map((item) => (
+          {Array.isArray(userInfo?.notes) && userInfo.notes.length > 0 ? (
+            userInfo.notes.map((item: NoteDetail) => (
               <View key={item.id} style={styles.travelogueItem}>
                 <View>
-                  <Text style={styles.travelogueItemTitle}>{item.title}</Text>
+                  <Text
+                    style={styles.travelogueItemTitle}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {item.title}
+                  </Text>
                   <Text style={styles.travelogueItemDate}>
                     {item.created_at.split("T")[0]}
                   </Text>
@@ -300,6 +302,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     color: "#222",
+    maxWidth: 180,
   },
   travelogueItemDate: {
     fontSize: 13,
