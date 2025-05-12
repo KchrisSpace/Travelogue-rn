@@ -35,7 +35,7 @@ export const getUserInfo = async (userId: string): Promise<UserInfo> => {
 export const getUserFollows = async (userId: string): Promise<UserInfo[]> => {
   try {
     const userInfo = await getUserInfo(userId);
-    const userInfoObj = userInfo.user_info || userInfo["user-info"] || {};
+    const userInfoObj = userInfo.user_info || {};
     const followIds = userInfoObj.follow || [];
     const followUsers = await Promise.all(
       followIds.map((id) => getUserInfo(id))
@@ -161,9 +161,28 @@ export const updateUserInfo = async (
 };
 
 // 新增：修改密码
-export const changePassword = async (id: string, oldPassword: string, newPassword: string) => {
-  const response = await axios.put(`${BASE_URL}/api/user`, { id, oldPassword, newPassword });
+export const changePassword = async (
+  id: string,
+  oldPassword: string,
+  newPassword: string
+) => {
+  const response = await axios.put(`${BASE_URL}/api/user`, {
+    id,
+    oldPassword,
+    newPassword,
+  });
   return response.data;
+};
+
+// 新增用户
+export const addUser = async (user: Partial<UserInfo>) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/user`, user);
+    return response.data;
+  } catch (error) {
+    console.error("注册用户失败", error);
+    throw error;
+  }
 };
 
 export default {
@@ -176,4 +195,5 @@ export default {
   updateUserInfo,
   checkIfFollowing,
   changePassword,
+  addUser,
 };

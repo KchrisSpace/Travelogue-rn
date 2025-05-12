@@ -92,6 +92,78 @@ function ConfirmModal({ visible, title, message, onConfirm, onCancel }: any) {
   );
 }
 
+// 简单自定义警告弹窗
+function SimpleAlert({
+  visible,
+  message,
+  onClose,
+}: {
+  visible: boolean;
+  message: string;
+  onClose: () => void;
+}) {
+  if (!visible) return null;
+  return (
+    <View
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0,0,0,0.2)",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 9999,
+      }}
+    >
+      <View
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: 12,
+          padding: 28,
+          width: 260,
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 18,
+            color: "#ff4d67",
+            fontWeight: "bold",
+            marginBottom: 16,
+          }}
+        >
+          提示
+        </Text>
+        <Text
+          style={{
+            fontSize: 16,
+            color: "#333",
+            marginBottom: 24,
+            textAlign: "center",
+          }}
+        >
+          {message}
+        </Text>
+        <TouchableOpacity
+          onPress={onClose}
+          style={{
+            backgroundColor: "#3bb3e6",
+            borderRadius: 8,
+            paddingVertical: 10,
+            paddingHorizontal: 32,
+          }}
+        >
+          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+            我知道了
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
 export default function SettingScreen() {
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -105,25 +177,39 @@ export default function SettingScreen() {
     title: "",
     message: "",
   });
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [newPasswordError, setNewPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   // 修改密码逻辑
   const handleChangePassword = async () => {
+    if (!user?.id) {
+      setAlertMessage("你还未登录，请先登录");
+      setAlertVisible(true);
+      return;
+    }
     if (!oldPassword || !newPassword || !confirmPassword) {
+      setPasswordError("");
       Alert.alert("错误", "请填写所有密码字段");
       return;
     }
-
     if (newPassword !== confirmPassword) {
-      Alert.alert("错误", "新密码与确认密码不匹配");
+      setPasswordError("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setNewPasswordError("两次新密码必须相同");
+      setConfirmPasswordError("两次新密码必须相同");
       return;
     }
-
+    if (newPassword === oldPassword) {
+      setNewPasswordError("不能和旧密码相同");
+      return;
+    }
     try {
-      if (!user?.id) {
-        Alert.alert("错误", "用户未登录");
-        return;
-      }
       await changePassword(user.id, oldPassword, newPassword);
+      setPasswordError("");
       Alert.alert("成功", "密码已更新，请重新登录", [
         {
           text: "确定",
@@ -135,15 +221,18 @@ export default function SettingScreen() {
       setNewPassword("");
       setConfirmPassword("");
     } catch (e: any) {
-      Alert.alert(
-        "修改失败",
-        e?.response?.data?.error || "请检查原密码是否正确"
-      );
+      setOldPassword("");
+      setPasswordError("密码不正确");
     }
   };
 
   // 登出账号
   const handleLogout = () => {
+    if (!user?.id) {
+      setAlertMessage("你还未登录，请先登录");
+      setAlertVisible(true);
+      return;
+    }
     setConfirmModal({
       visible: true,
       type: "logout",
@@ -154,6 +243,11 @@ export default function SettingScreen() {
 
   // 切换账号
   const handleSwitchAccount = () => {
+    if (!user?.id) {
+      setAlertMessage("你还未登录，请先登录");
+      setAlertVisible(true);
+      return;
+    }
     setConfirmModal({
       visible: true,
       type: "switch",
@@ -170,10 +264,7 @@ export default function SettingScreen() {
 
   // 关于开发者
   const handleAboutDeveloper = () => {
-    Alert.alert(
-      "关于开发者",
-      "该应用由XXX开发团队打造\n版本号: 1.0.0\n联系方式: example@email.com"
-    );
+    router.push("/setting/about");
   };
 
   // 确认弹窗的回调
@@ -280,23 +371,53 @@ export default function SettingScreen() {
                 style={styles.input}
                 placeholder="当前密码"
                 value={oldPassword}
-                onChangeText={setOldPassword}
+                onChangeText={(text) => {
+                  setOldPassword(text);
+                  setPasswordError("");
+                  setNewPasswordError("");
+                  setConfirmPasswordError("");
+                }}
                 secureTextEntry
               />
+              {passwordError ? (
+                <Text style={{ color: "red", marginBottom: 8 }}>
+                  {passwordError}
+                </Text>
+              ) : null}
               <TextInput
                 style={styles.input}
                 placeholder="新密码"
                 value={newPassword}
-                onChangeText={setNewPassword}
+                onChangeText={(text) => {
+                  setNewPassword(text);
+                  setPasswordError("");
+                  setNewPasswordError("");
+                  setConfirmPasswordError("");
+                }}
                 secureTextEntry
               />
+              {newPasswordError ? (
+                <Text style={{ color: "red", marginBottom: 8 }}>
+                  {newPasswordError}
+                </Text>
+              ) : null}
               <TextInput
                 style={styles.input}
                 placeholder="确认新密码"
                 value={confirmPassword}
-                onChangeText={setConfirmPassword}
+                onChangeText={(text) => {
+                  setConfirmPassword(text);
+                  setPasswordError("");
+                  setNewPasswordError("");
+                  setConfirmPasswordError("");
+                }}
                 secureTextEntry
               />
+              {confirmPasswordError ? (
+                <Text style={{ color: "red", marginBottom: 8 }}>
+                  {confirmPasswordError}
+                </Text>
+              ) : null}
 
               <View style={styles.modalButtons}>
                 <TouchableOpacity
@@ -322,6 +443,11 @@ export default function SettingScreen() {
         message={confirmModal.message}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
+      />
+      <SimpleAlert
+        visible={alertVisible}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
       />
     </>
   );

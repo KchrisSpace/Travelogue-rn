@@ -29,6 +29,8 @@ interface User {
 export default function LoginScreen() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
+  const [idFocused, setIdFocused] = useState(false);
+  const [pwFocused, setPwFocused] = useState(false);
   const { login } = useAuth();
   const params = useLocalSearchParams();
   const redirect = params.redirect as string | undefined;
@@ -70,20 +72,24 @@ export default function LoginScreen() {
 
         <View style={styles.form}>
           <TextInput
-            style={styles.input}
-            placeholder="账号"
+            style={[styles.input, idFocused && styles.inputFocused]}
+            placeholder="账号ID"
             value={id}
             onChangeText={setId}
             autoCapitalize="none"
             placeholderTextColor="#b3e0f7"
+            onFocus={() => setIdFocused(true)}
+            onBlur={() => setIdFocused(false)}
           />
           <TextInput
-            style={styles.input}
+            style={[styles.input, pwFocused && styles.inputFocused]}
             placeholder="密码"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
             placeholderTextColor="#b3e0f7"
+            onFocus={() => setPwFocused(true)}
+            onBlur={() => setPwFocused(false)}
           />
 
           <TouchableOpacity style={styles.forgotPassword}>
@@ -173,6 +179,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#b3e0f7",
     color: "#3bb3e6",
+  },
+  inputFocused: {
+    borderColor: "#3bb3e6",
+    outlineWidth: 0,
+    outline: "none",
+    shadowColor: "#3bb3e6",
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
   forgotPassword: {
     alignSelf: "flex-end",

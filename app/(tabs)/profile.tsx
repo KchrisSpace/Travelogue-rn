@@ -106,17 +106,25 @@ export default function PersonalCenter() {
               />
             </View>
             <View style={styles.infoCol}>
-              <Text style={styles.nickname}>
-                {userInfo && userInfo["user_info"]?.nickname
-                  ? userInfo["user_info"].nickname
-                  : "未登录"}
-              </Text>
-              <Text style={styles.userid}>{user?.id ? `@${user.id}` : ""}</Text>
-              {userInfo && userInfo["user_info"]?.signature ? (
-                <Text style={styles.signature}>
-                  {userInfo["user_info"].signature}
-                </Text>
-              ) : null}
+              {user?.id ? (
+                <>
+                  <Text style={styles.nickname}>
+                    {userInfo && userInfo["user_info"]?.nickname
+                      ? userInfo["user_info"].nickname
+                      : "无名路人甲"}
+                  </Text>
+                  <Text style={styles.userid}>
+                    {user?.id ? `@${user.id}` : "未登录"}
+                  </Text>
+                  {userInfo && userInfo["user_info"]?.signature ? (
+                    <Text style={styles.signature}>
+                      {userInfo["user_info"].signature}
+                    </Text>
+                  ) : null}
+                </>
+              ) : (
+                <Text style={styles.nickname}>未登录</Text>
+              )}
             </View>
           </View>
           <View style={styles.statsRow}>
@@ -129,7 +137,10 @@ export default function PersonalCenter() {
               </Text>
               <Text style={styles.statLabel}>关注</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.statItem} onPress={() => router.push("/fans-follow/fans")}>
+            <TouchableOpacity
+              style={styles.statItem}
+              onPress={() => router.push("/fans-follow/fans")}
+            >
               <Text style={styles.statNum}>
                 {userInfo?.["user_info"]?.fans?.length || 0}
               </Text>
@@ -143,8 +154,9 @@ export default function PersonalCenter() {
             </TouchableOpacity>
           </View>
           <TouchableOpacity
-            style={styles.editBtn}
-            onPress={() => router.push("/profile-edit")}
+            style={[styles.editBtn, !user?.id && { backgroundColor: "#ccc" }]}
+            onPress={() => user?.id && router.push("/profile-edit")}
+            disabled={!user?.id}
           >
             <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
               编辑个人资料
@@ -169,7 +181,10 @@ export default function PersonalCenter() {
                     {item.created_at.split("T")[0]}
                   </Text>
                 </View>
-                <TouchableOpacity style={styles.viewBtn}>
+                <TouchableOpacity
+                  style={styles.viewBtn}
+                  onPress={() => router.push(`/detail/${item.id}`)}
+                >
                   <Text style={{ color: "#fff", fontWeight: "bold" }}>
                     查看
                   </Text>

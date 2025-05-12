@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getUserInfo } from "../services/userService";
+import { getUserInfo, addUser } from "../services/userService";
 
 interface User {
   id: string;
@@ -94,6 +94,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (id: string, password: string) => {
     try {
+      // 校验id只能为数字和字母
+      if (!/^[a-zA-Z0-9]+$/.test(id)) {
+        throw new Error("账号只能包含数字和英文字母");
+      }
       // 检查id是否已存在
       let userExists = false;
       try {
@@ -105,8 +109,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (userExists) {
         throw new Error("该账号已存在");
       }
-      // 写入新用户（此处需你后端支持POST /api/user，若无则仅本地存储模拟）
-      const newUser = { id, password };
+      // 写入新用户到后端
+      const newUser = { id, password, user_info: { avatar: '', nickname: '', gender: '', birthday: '', city: '', signature: '', follow: [], fans: [] }, favorite: [], name: id };
+      await addUser(newUser);
       await AsyncStorage.setItem("user", JSON.stringify(newUser));
       setUser(newUser);
       setIsAuthenticated(true);

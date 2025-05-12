@@ -17,11 +17,18 @@ export default function RegisterScreen() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [idFocused, setIdFocused] = useState(false);
+  const [pwFocused, setPwFocused] = useState(false);
+  const [confirmFocused, setConfirmFocused] = useState(false);
   const { register } = useAuth();
 
   const handleRegister = async () => {
     if (!id || !password || !confirmPassword) {
       Alert.alert("错误", "请填写所有信息");
+      return;
+    }
+    if (!/^[a-zA-Z0-9]+$/.test(id)) {
+      Alert.alert("错误", "账号只能包含数字和英文字母");
       return;
     }
     if (password !== confirmPassword) {
@@ -50,34 +57,40 @@ export default function RegisterScreen() {
         </View>
         <View style={styles.form}>
           <TextInput
-            style={styles.input}
-            placeholder="账号"
+            style={[styles.input, idFocused && styles.inputFocused]}
+            placeholder="账号ID"
             value={id}
             onChangeText={setId}
             autoCapitalize="none"
             placeholderTextColor="#b3e0f7"
+            onFocus={() => setIdFocused(true)}
+            onBlur={() => setIdFocused(false)}
           />
           <TextInput
-            style={styles.input}
+            style={[styles.input, pwFocused && styles.inputFocused]}
             placeholder="密码"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
             placeholderTextColor="#b3e0f7"
+            onFocus={() => setPwFocused(true)}
+            onBlur={() => setPwFocused(false)}
           />
           <TextInput
-            style={styles.input}
+            style={[styles.input, confirmFocused && styles.inputFocused]}
             placeholder="确认密码"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
             placeholderTextColor="#b3e0f7"
+            onFocus={() => setConfirmFocused(true)}
+            onBlur={() => setConfirmFocused(false)}
           />
           <TouchableOpacity
             style={styles.registerButton}
             onPress={handleRegister}
           >
-            <Text style={styles.registerButtonText}>注册</Text>
+            <Text style={styles.registerButtonText}>注册并登陆</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.loginContainer}>
@@ -164,6 +177,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#b3e0f7",
     color: "#3bb3e6",
+  },
+  inputFocused: {
+    borderColor: "#3bb3e6",
+    outlineWidth: 0,
+    outline: "none",
+    shadowColor: "#3bb3e6",
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
   registerButton: {
     backgroundColor: "#3bb3e6",

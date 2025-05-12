@@ -86,11 +86,25 @@ const FansPage = () => {
   return (
     <View className="flex-1 bg-gray-50">
       {/* 顶部返回栏 */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' }}>
-        <TouchableOpacity onPress={() => router.back()} style={{ padding: 4, marginRight: 8 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          padding: 12,
+          backgroundColor: "#fff",
+          borderBottomWidth: 1,
+          borderBottomColor: "#eee",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={{ padding: 4, marginRight: 8 }}
+        >
           <Ionicons name="arrow-back" size={24} color="#222" />
         </TouchableOpacity>
-        <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#222' }}>粉丝</Text>
+        <Text style={{ fontSize: 18, fontWeight: "bold", color: "#222" }}>
+          粉丝
+        </Text>
       </View>
       {/* 列表内容 */}
       {fansUsers.length > 0 ? (
