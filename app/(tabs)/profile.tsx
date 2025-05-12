@@ -120,7 +120,10 @@ export default function PersonalCenter() {
             </View>
           </View>
           <View style={styles.statsRow}>
-            <TouchableOpacity style={styles.statItem}>
+            <TouchableOpacity
+              style={styles.statItem}
+              onPress={() => router.push("/(tabs)/index_follow")}
+            >
               <Text style={styles.statNum}>
                 {userInfo?.["user_info"]?.follow?.length || 0}
               </Text>

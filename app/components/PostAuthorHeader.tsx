@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
+import { useAuth } from "../../hooks/useAuth";
 import { UserInfo, followUser, unfollowUser } from "../../services/userService";
 
 interface PostAuthorHeaderProps {

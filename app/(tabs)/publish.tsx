@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import CustomAlert from "../../components/CustomAlert";
 import { ThemedText } from "../../components/ThemedText";
 import { useAuth } from "../../hooks/useAuth";
 import { useThemeColor } from "../../hooks/useThemeColor";
@@ -26,11 +27,20 @@ export default function PublishScreen() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
+  const [imageLink, setImageLink] = useState("");
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [content, setContent] = useState("");
   const backgroundColor = useThemeColor({}, "background");
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const showAlert = (message: string) => {
+    setAlertMessage(message);
+    setAlertVisible(true);
+  };
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -58,40 +68,72 @@ export default function PublishScreen() {
 
   const handleSubmit = async () => {
     if (!user) {
-      alert("请先登录");
+      showAlert("请先登录");
       router.replace("/auth?redirect=/publish");
       return;
     }
-
-    const postData = {
-      id: `post_${Date.now()}`, // Generate a unique ID
-      user_id: user.id,
-      title,
-      content,
-      image: image ? [image] : [],
-      video: "", // Default empty video
-      location,
-      status: "pending", // Set initial status
-      created_at: new Date().toISOString(),
-      comments: [], // Default empty comments
-    };
+    if (!title.trim()) {
+      showAlert("标题不能为空");
+      return;
+    }
+    if (!content.trim()) {
+      showAlert("正文不能为空");
+      return;
+    }
 
     try {
-      const response = await publishNote(postData);
-      if (response) {
-        alert("发布成功！");
-        router.replace("/(tabs)"); // Navigate to the main page or another page
+      // 显示加载状态
+      setIsSubmitting(true);
+
+      const images: string[] = [];
+      if (imageLink) {
+        images.push(imageLink);
       } else {
-        alert("发布失败，请重试。");
+        images.push("https://picsum.photos/360/460?random=333");
+      }
+
+      const postData = {
+        id: `post_${Date.now()}`,
+        user_id: user.id,
+        title,
+        content,
+        image: images,
+        video: "",
+        location,
+        status: "pending",
+        created_at: new Date().toISOString(),
+        comments: [],
+      };
+
+      console.log("准备发布游记:", postData);
+      const response = await publishNote(postData);
+      console.log("发布游记成功，返回数据:", response);
+
+      if (response) {
+        console.log("发布成功，准备跳转页面");
+        showAlert("发布成功！");
+        setTimeout(() => {
+          router.replace("/(tabs)"); // Navigate to the main page or another page
+        }, 1500);
+      } else {
+        showAlert("发布失败，请重试。");
       }
     } catch (error) {
-      console.error("发布失败:", error);
-      alert("发布失败，请重试。");
+      console.error("发布游记时出错:", error);
+      showAlert(error instanceof Error ? error.message : "发布失败，请重试。");
+    } finally {
+      // 隐藏加载状态
+      setIsSubmitting(false);
     }
   };
 
   return (
     <ScrollView style={[styles.container, { backgroundColor }]}>
+      <CustomAlert
+        visible={alertVisible}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+      />
       <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
         发布游记
       </Text>
@@ -108,6 +150,28 @@ export default function PublishScreen() {
             </View>
           )}
         </TouchableOpacity>
+        <View style={styles.inputGroup}>
+          <ThemedText>图片链接</ThemedText>
+          <TextInput
+            style={styles.input}
+            value={imageLink}
+            onChangeText={setImageLink}
+            placeholder="请输入图片链接"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {imageLink ? (
+            <Image
+              source={{ uri: imageLink }}
+              style={{
+                width: "100%",
+                height: 100,
+                marginTop: 8,
+                borderRadius: 8,
+              }}
+            />
+          ) : null}
+        </View>
         <View style={styles.inputGroup}>
           <ThemedText>标题</ThemedText>
           <TextInput
@@ -138,7 +202,11 @@ export default function PublishScreen() {
             numberOfLines={10}
           />
         </View>
-        <Button title="发布" onPress={handleSubmit} />
+        <Button
+          title={isSubmitting ? "发布中..." : "发布"}
+          onPress={handleSubmit}
+          disabled={isSubmitting}
+        />
       </View>
     </ScrollView>
   );

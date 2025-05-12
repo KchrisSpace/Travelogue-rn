@@ -161,16 +161,8 @@ export const updateUserInfo = async (
 };
 
 // 新增：修改密码
-export const changePassword = async (
-  id: string,
-  oldPassword: string,
-  newPassword: string
-) => {
-  const response = await axios.put(`${BASE_URL}/api/user`, {
-    id,
-    oldPassword,
-    newPassword,
-  });
+export const changePassword = async (id: string, oldPassword: string, newPassword: string) => {
+  const response = await axios.put(`${BASE_URL}/api/user`, { id, oldPassword, newPassword });
   return response.data;
 };
 

@@ -1,6 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,12 +9,12 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
+} from "react-native";
 import {
   UserInfo,
   getUserFollows,
   unfollowUser,
-} from '../../services/userService';
+} from "../../services/userService";
 
 const IndexFollow = () => {
   const [loading, setLoading] = useState(true);
@@ -22,7 +22,7 @@ const IndexFollow = () => {
   const [followUsers, setFollowUsers] = useState<UserInfo[]>([]);
 
   // 模拟当前登录用户
-  const currentUserId = 'user1';
+  const currentUserId = "user1";
 
   // 获取关注用户列表
   useEffect(() => {
@@ -35,7 +35,7 @@ const IndexFollow = () => {
       const users = await getUserFollows(currentUserId);
       setFollowUsers(users);
     } catch (error) {
-      console.error('获取关注数据失败:', error);
+      console.error("获取关注数据失败:", error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -54,7 +54,7 @@ const IndexFollow = () => {
         setFollowUsers(followUsers.filter((user) => user.id !== userId));
       }
     } catch (error) {
-      console.error('取消关注失败:', error);
+      console.error("取消关注失败:", error);
     }
   };
 
@@ -65,11 +65,12 @@ const IndexFollow = () => {
           <TouchableOpacity
             className="flex-row items-center flex-1"
             onPress={() => {
-              router.push('/(tabs)');
-            }}>
+              router.push("/(tabs)");
+            }}
+          >
             <Image
               source={{
-                uri: item.user_info?.avatar || 'https://via.placeholder.com/40',
+                uri: item.user_info?.avatar || "https://via.placeholder.com/40",
               }}
               className="w-12 h-12 rounded-full"
             />
@@ -78,14 +79,15 @@ const IndexFollow = () => {
                 {item.user_info?.nickname || item.name}
               </Text>
               <Text className="text-xs text-gray-500 mt-1" numberOfLines={1}>
-                {item.user_info?.signature || '这个人很懒，什么都没留下'}
+                {item.user_info?.signature || "这个人很懒，什么都没留下"}
               </Text>
             </View>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => handleUnfollow(item.id)}
-            className="bg-gray-200 px-3 py-1 rounded-full">
+            className="bg-gray-200 px-3 py-1 rounded-full"
+          >
             <Text className="text-xs text-gray-600">已关注</Text>
           </TouchableOpacity>
         </View>
@@ -115,7 +117,7 @@ const IndexFollow = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
-              colors={['#FF4D67']}
+              colors={["#FF4D67"]}
               tintColor="#FF4D67"
             />
           }
@@ -130,8 +132,9 @@ const IndexFollow = () => {
             关注感兴趣的用户，他们的最新动态将显示在这里
           </Text>
           <TouchableOpacity
-            onPress={() => router.push('/(tabs)')}
-            className="mt-6 bg-[#FF4D67] px-6 py-2 rounded-full">
+            onPress={() => router.push("/(tabs)")}
+            className="mt-6 bg-[#FF4D67] px-6 py-2 rounded-full"
+          >
             <Text className="text-white font-medium">去发现</Text>
           </TouchableOpacity>
         </View>
