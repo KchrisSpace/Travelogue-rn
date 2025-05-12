@@ -122,14 +122,14 @@ export default function PersonalCenter() {
           <View style={styles.statsRow}>
             <TouchableOpacity
               style={styles.statItem}
-              onPress={() => router.push("/(tabs)/index_follow")}
+              onPress={() => router.push("/fans-follow/follow")}
             >
               <Text style={styles.statNum}>
                 {userInfo?.["user_info"]?.follow?.length || 0}
               </Text>
               <Text style={styles.statLabel}>关注</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.statItem}>
+            <TouchableOpacity style={styles.statItem} onPress={() => router.push("/fans-follow/fans")}>
               <Text style={styles.statNum}>
                 {userInfo?.["user_info"]?.fans?.length || 0}
               </Text>
