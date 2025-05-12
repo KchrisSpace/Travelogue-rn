@@ -12,6 +12,85 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../../hooks/useAuth";
+import { changePassword } from "../../services/userService";
+
+// 简单的自定义确认弹窗组件
+function ConfirmModal({ visible, title, message, onConfirm, onCancel }: any) {
+  if (!visible) return null;
+  return (
+    <View
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0,0,0,0.3)",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 9999,
+      }}
+    >
+      <View
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: 10,
+          padding: 24,
+          width: 280,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: "bold",
+            marginBottom: 12,
+            textAlign: "center",
+          }}
+        >
+          {title}
+        </Text>
+        <Text
+          style={{
+            fontSize: 16,
+            color: "#333",
+            marginBottom: 20,
+            textAlign: "center",
+          }}
+        >
+          {message}
+        </Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              marginRight: 8,
+              backgroundColor: "#f1f1f1",
+              borderRadius: 8,
+              padding: 12,
+              alignItems: "center",
+            }}
+            onPress={onCancel}
+          >
+            <Text style={{ color: "#333", fontWeight: "bold" }}>取消</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              marginLeft: 8,
+              backgroundColor: "#22c55e",
+              borderRadius: 8,
+              padding: 12,
+              alignItems: "center",
+            }}
+            onPress={onConfirm}
+          >
+            <Text style={{ color: "#fff", fontWeight: "bold" }}>确定</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+}
 
 export default function SettingScreen() {
   const { user, logout } = useAuth();
@@ -20,9 +99,15 @@ export default function SettingScreen() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmModal, setConfirmModal] = useState({
+    visible: false,
+    type: "",
+    title: "",
+    message: "",
+  });
 
   // 修改密码逻辑
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (!oldPassword || !newPassword || !confirmPassword) {
       Alert.alert("错误", "请填写所有密码字段");
       return;
@@ -33,46 +118,54 @@ export default function SettingScreen() {
       return;
     }
 
-    // 这里应调用更新密码的API
-    Alert.alert("成功", "密码已更新");
-    setPasswordModal(false);
-    setOldPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    try {
+      if (!user?.id) {
+        Alert.alert("错误", "用户未登录");
+        return;
+      }
+      await changePassword(user.id, oldPassword, newPassword);
+      Alert.alert("成功", "密码已更新，请重新登录", [
+        {
+          text: "确定",
+          onPress: handlePasswordChangeSuccess,
+        },
+      ]);
+      setPasswordModal(false);
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (e: any) {
+      Alert.alert(
+        "修改失败",
+        e?.response?.data?.error || "请检查原密码是否正确"
+      );
+    }
   };
 
   // 登出账号
   const handleLogout = () => {
-    Alert.alert("确认登出", "确定要退出登录吗？", [
-      {
-        text: "取消",
-        style: "cancel",
-      },
-      {
-        text: "确定",
-        onPress: async () => {
-          await logout();
-          router.replace("/auth/login");
-        },
-      },
-    ]);
+    setConfirmModal({
+      visible: true,
+      type: "logout",
+      title: "确认登出",
+      message: "确定要退出登录吗？",
+    });
   };
 
   // 切换账号
   const handleSwitchAccount = () => {
-    Alert.alert("确认切换账号", "确定要切换到其他账号吗？", [
-      {
-        text: "取消",
-        style: "cancel",
-      },
-      {
-        text: "确定",
-        onPress: async () => {
-          await logout();
-          router.replace("/auth/login");
-        },
-      },
-    ]);
+    setConfirmModal({
+      visible: true,
+      type: "switch",
+      title: "确认切换账号",
+      message: "确定要切换到其他账号吗？",
+    });
+  };
+
+  // 修改密码成功后登出
+  const handlePasswordChangeSuccess = async () => {
+    await logout();
+    router.replace("/auth");
   };
 
   // 关于开发者
@@ -81,6 +174,18 @@ export default function SettingScreen() {
       "关于开发者",
       "该应用由XXX开发团队打造\n版本号: 1.0.0\n联系方式: example@email.com"
     );
+  };
+
+  // 确认弹窗的回调
+  const handleConfirm = async () => {
+    setConfirmModal({ ...confirmModal, visible: false });
+    if (confirmModal.type === "logout" || confirmModal.type === "switch") {
+      await logout();
+      router.replace("/auth");
+    }
+  };
+  const handleCancel = () => {
+    setConfirmModal({ ...confirmModal, visible: false });
   };
 
   return (
@@ -211,6 +316,13 @@ export default function SettingScreen() {
           </View>
         </Modal>
       </View>
+      <ConfirmModal
+        visible={confirmModal.visible}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </>
   );
 }
