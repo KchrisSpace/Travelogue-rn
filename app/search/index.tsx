@@ -184,11 +184,11 @@ const SearchResultItem = ({ item }: SearchResultItemProps) => {
             </View>
           </View>
         ) : (
-          <Image
-            source={{ uri: item.image[0] }}
-            className="w-full h-full"
-            resizeMode="cover"
-          />
+        <Image
+          source={{ uri: item.image[0] }}
+          className="w-full h-full"
+          resizeMode="cover"
+        />
         )}
       </View>
       <View className="mx-2 mt-2 mb-3">

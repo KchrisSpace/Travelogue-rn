@@ -140,7 +140,7 @@ const Index_all = () => {
             fetchNextPage();
           }
         }}
-        onEndReachedThreshold={0.3}
+        onEndReachedThreshold={0.5}
         renderItem={({ item }) => {
           // 随机高度，范围100-250之间
           const imageHeight = 100 + Math.floor(Math.random() * 150);
