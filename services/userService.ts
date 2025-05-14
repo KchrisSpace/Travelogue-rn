@@ -132,7 +132,7 @@ export const getUserFavorites = async (
     const favoriteIds = userInfo.favorite || [];
     if (favoriteIds.length === 0) return [];
     // 批量获取游记详情
-    const { getNoteDetail } = await import("./noteService");
+    const { getNoteDetail } = import("./noteService");
     const favoriteNotes = await Promise.all(
       favoriteIds.map((id) => getNoteDetail(id))
     );
@@ -153,6 +153,8 @@ export const updateUserInfo = async (
       id: userId,
       ...data,
     });
+        console.log(response);
+
     return response.data;
   } catch (error) {
     console.error("更新用户信息失败", error);
