@@ -39,6 +39,11 @@ export default function EditProfile() {
       updateData.user_info.avatar = avatar;
       updateData.user_info.nickname = nickname;
       updateData.user_info.signature = signature;
+
+      // 排除 follow 和 fans 字段
+      const { follow, fans, ...restUserInfo } = updateData.user_info;
+      updateData.user_info = restUserInfo;
+
       await updateUserInfo(user.id, updateData);
       await refreshUser();
       Alert.alert("保存成功");
@@ -73,7 +78,7 @@ export default function EditProfile() {
         ) : null}
 
         <Text style={styles.label}>昵称</Text>
-         <TextInput
+        <TextInput
           style={styles.input}
           value={nickname}
           onChangeText={setNickname}
