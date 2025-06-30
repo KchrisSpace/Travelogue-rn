@@ -47,7 +47,7 @@
 
 ### 开发工具
 
-- ESLint
+- x 1npm install2​33. 启动开发服务器4​5```bash6npm run dev7​84. 构建生产版本9​10```bash11npm run build12​13## 可用脚本14​15- `npm run dev` - 启动开发服务器16- `npm run build` - 构建生产版本17- `npm run lint` - 运行 ESLint 检查18- `npm run preview` - 预览生产构建19​20## 开发规范21​22- 使用 TypeScript 进行开发23- 遵循 ESLint 规范24- 使用 Prettier 进行代码格式化25​26## 贡献指南27​281. Fork 本仓库292. 创建您的特性分支 (`git checkout -b feature/AmazingFeature`)303. 提交您的更改 (`git commit -m 'Add some AmazingFeature'`)314. 推送到分支 (`git push origin feature/AmazingFeature`)325. 开启一个 Pull Request33​34​35​36​bash
 - TypeScript
 - TailwindCSS
 

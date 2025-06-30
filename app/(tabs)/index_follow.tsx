@@ -46,7 +46,7 @@ const IndexFollow = () => {
     setRefreshing(true);
     fetchFollowData();
   };
-
+//取消关注
   const handleUnfollow = async (userId: string) => {
     try {
       const success = await unfollowUser(currentUserId, userId);

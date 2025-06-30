@@ -31,7 +31,7 @@ interface NotesResponse {
 interface NoteWithUserInfo extends Note {
   userInfo?: UserInfo;
 }
-
+//该函数配合 useInfiniteQuery 实现前端的游记分页加载。
 const fetchNotes = async ({
   pageParam = undefined,
 }: {
@@ -39,10 +39,10 @@ const fetchNotes = async ({
 }): Promise<NotesResponse> => {
   const response = await axios.get(`${BASE_URL}/api/notes`, {
     params: {
-      type: "cursor",
-      cursor: pageParam,
-      limit: 4,
-      status: "approved",
+      type: "cursor",//指定分页类型为游标分页
+      cursor: pageParam,//当前分页的游标（第一页时为 undefined）。
+      limit: 4,//每页请求 4 条数据
+      status: "approved",//只请求已审核通过的游记。
     },
   });
   console.log("response.data", response.data);
@@ -56,21 +56,23 @@ const Index_all = () => {
   >([]);
 
   const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
+    data,//所有已加载的分页数据。
+    fetchNextPage,//加载下一页的函数
+    hasNextPage,//是否还有下一页
+    isFetchingNextPage,//是否正在加载下一页
+    isLoading,//是否正在加载数据
+    isError,//是否加载数据出错
+    // error,//加载数据出错时的错误信息
     error,
   } = useInfiniteQuery({
-    queryKey: ["notes"],
-    queryFn: fetchNotes,
-    initialPageParam: undefined,
+    queryKey: ["notes"],//查询的唯一标识符，通常用来区分不同的数据请求。
+    queryFn: fetchNotes,//获取数据的函数。每次请求新的一页时会调用它
+    initialPageParam: undefined,//初始的分页参数。第一次请求时传递给 fetchNotes。
     getNextPageParam: (lastPage) => {
+     // 用于确定下一页的参数。lastPage 是上一次请求返回的数据。
       return lastPage.hasMore ? lastPage.nextCursor : undefined;
     },
-    staleTime: 1000 * 60 * 1,
+    // staleTime: 1000 * 60 * 1,
   });
 
   // 当笔记数据变化时，获取用户信息
@@ -81,7 +83,7 @@ const Index_all = () => {
       const allNotes = data.pages.flatMap((page) => page.data);
       const notesWithInfo: NoteWithUserInfo[] = [...allNotes];
 
-      // 获取所有不重复的用户ID
+      // 获取所有不重复的用户ID 避免重复请求同一个用户的信息，提升效率。Set 结构去重
       const userIds = [...new Set(allNotes.map((note) => note.user_id))];
 
       // 批量获取用户信息
@@ -98,6 +100,7 @@ const Index_all = () => {
         const userInfoResults = await Promise.all(promises);
 
         // 创建用户ID到用户信息的映射
+        //声明一个空对象 userInfoMap，类型为 Record<string, UserInfo>，即“以字符串为键、UserInfo 类型为值”的对象。
         const userInfoMap: Record<string, UserInfo> = {};
         userInfoResults.forEach((info) => {
           if (info) {

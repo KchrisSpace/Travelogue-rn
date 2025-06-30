@@ -2,11 +2,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
+  ActivityIndicator,//用于显示加载中的动画（通常是一个转圈），常用于数据加载时给用户反馈。
   ScrollView,
-  Share,
+  Share,//提供原生的分享功能，可以让用户将内容分享到其他应用（如微信、QQ、邮件等）
   Text,
-  TouchableOpacity,
+  TouchableOpacity,//可点击的组件，点击时会有透明度变化的视觉反馈，常用于按钮或可交互的区域。
   View,
 } from "react-native";
 import { Comment, NoteDetail, getNoteDetail } from "../../services/noteService";
@@ -23,10 +23,6 @@ import PostContent from "../components/PostContent";
 import PostHeader from "../components/PostHeader";
 import PostMediaCarousel from "../components/PostMediaCarousel";
 
-type MediaItem = {
-  type: "image" | "video";
-  url: string;
-};
 
 const Detail = () => {
   const { post_id } = useLocalSearchParams();
@@ -76,8 +72,12 @@ const Detail = () => {
 
         // 获取评论用户信息
         if (noteData.comments && noteData.comments.length > 0) {
-          const commentUserIds = [
-            ...new Set(noteData.comments.map((comment) => comment["user_id"])),
+                  const commentUserIds = [
+            ...new Set(
+              noteData.comments
+                .map((comment) => comment["user_id"])
+                .filter((id) => id != null)
+            ),
           ];
 
           try {
@@ -238,7 +238,7 @@ const Detail = () => {
         {/* 媒体展示区域 */}
         <PostMediaCarousel
           mediaList={
-            post.image
+            post.image || post.video
               ? [
                   // 如果有视频，将视频放在第一位
                   ...(post.video
@@ -258,7 +258,7 @@ const Detail = () => {
         <PostHeader post={post} />
 
         {/* 内容区域 */}
-        <PostContent content={post.content} userInfo={userInfo} post={post} />
+        <PostContent content={post.content} post={post} />
 
         {/* 评论区域 */}
         <PostComments

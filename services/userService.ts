@@ -17,7 +17,7 @@ export interface UserInfo {
     follow: string[];
     fans: string[];
   };
-  favorite?: string[];
+  // favorite?: string[];
 }
 
 // 获取用户信息

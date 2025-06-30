@@ -301,9 +301,11 @@ const Search = () => {
   useEffect(() => {
     const loadSearchHistory = async () => {
       try {
+        //AsyncStorage 通常用于 React Native 项目，类似于浏览器的 localStorage。
         const historyJson = await AsyncStorage.getItem(SEARCH_HISTORY_KEY);
         if (historyJson) {
           const history = JSON.parse(historyJson);
+          //如果解析出来的是数组，则设置为搜索历史；否则设置为空数组，防止数据异常。
           setSearchHistory(Array.isArray(history) ? history : []);
         }
       } catch (error) {

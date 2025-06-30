@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
-import { useAuth } from "../../hooks/useAuth";
-import { UserInfo, followUser, unfollowUser } from "../../services/userService";
+import React, { useEffect, useState } from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
+// import { useAuth } from '../../hooks/useAuth';
+
+import { UserInfo, followUser, unfollowUser } from '../../services/userService';
 
 interface PostAuthorHeaderProps {
   userInfo: UserInfo | null;
@@ -16,8 +17,8 @@ const PostAuthorHeader = ({
   onFollowPress,
   isFollowing: externalIsFollowing, // 从外部传入的状态
 }: PostAuthorHeaderProps) => {
-  const { user } = useAuth();
-  const realUserId = currentUserId || user?.id;
+  // const { user } = useAuth();
+  // const realUserId = currentUserId || user?.id;
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -27,14 +28,13 @@ const PostAuthorHeader = ({
       setIsFollowing(externalIsFollowing);
     } else if (userInfo && currentUserId) {
       // 否则使用本地计算的状态
-      const isAlreadyFollowing =
-        userInfo["user_info"]?.fans?.includes(currentUserId);
+      const isAlreadyFollowing = userInfo['user_info']?.fans?.includes(currentUserId);
       setIsFollowing(!!isAlreadyFollowing);
     }
   }, [userInfo, currentUserId, externalIsFollowing]);
 
   const handleFollowPress = async () => {
-    if (!userInfo || !userInfo.id || loading) return;
+    if (!userInfo || !userInfo.id || !currentUserId || loading) return;
 
     try {
       setLoading(true);
@@ -52,7 +52,7 @@ const PostAuthorHeader = ({
         onFollowPress();
       }
     } catch (error) {
-      console.error("关注/取消关注操作失败:", error);
+      console.error('关注/取消关注操作失败:', error);
     } finally {
       setLoading(false);
     }
@@ -66,25 +66,23 @@ const PostAuthorHeader = ({
     <View className="flex-row items-center">
       <Image
         source={{
-          uri:
-            userInfo?.["user_info"]?.avatar || "https://via.placeholder.com/32",
+          uri: userInfo?.['user_info']?.avatar || 'https://via.placeholder.com/32',
         }}
         className="w-12 h-12 rounded-full"
       />
-      <Text className="ml-2 text-sm font-medium flex-1" numberOfLines={1}>
-        {userInfo?.["user_info"]?.nickname || "momo"}
+      <Text
+        className="ml-2 text-sm font-medium flex-1"
+        numberOfLines={1}
+      >
+        {userInfo?.['user_info']?.nickname || 'momo'}
       </Text>
       <TouchableOpacity
         onPress={handleFollowPress}
         disabled={loading}
-        className={`ml-5 px-3 py-1 rounded-full ${
-          isFollowing ? "bg-gray-200" : "bg-[#FF4D67]"
-        }`}
+        className={`ml-5 px-3 py-1 rounded-full ${isFollowing ? 'bg-gray-200' : 'bg-[#FF4D67]'}`}
       >
-        <Text
-          className={`text-xs ${isFollowing ? "text-gray-600" : "text-white"}`}
-        >
-          {loading ? "加载中..." : isFollowing ? "已关注" : "关注"}
+        <Text className={`text-xs ${isFollowing ? 'text-gray-600' : 'text-white'}`}>
+          {loading ? '加载中...' : isFollowing ? '已关注' : '关注'}
         </Text>
       </TouchableOpacity>
     </View>

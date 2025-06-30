@@ -7,6 +7,7 @@ interface PostCommentsProps {
   noteId: string;
   comments: Comment[];
   commentUsers: Record<string, UserInfo>;
+  //这个函数通常用于在添加新评论后通知父组件或处理相关逻辑。
   onCommentAdded: (newComment: Comment) => void;
 }
 
@@ -94,6 +95,7 @@ const PostComments = ({
       </View>
 
       {/* 添加评论 */}
+      {/*  multiline允许输入多行文本 */}
       <View className="p-2 flex-row items-end border-t border-t-gray-200 sticky bottom-0 bg-white">
         <TextInput
           className="flex-1 min-h-[40px] max-h-[50px] border border-gray-300 rounded-full outline-none px-4 py-2 text-sm"
